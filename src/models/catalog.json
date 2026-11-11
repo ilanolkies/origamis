@@ -1,0 +1,14 @@
+{
+  "tulip": {
+    "category": "Flowers",
+    "difficulty": 1,
+    "minutes": 5,
+    "tools": ["scissors"]
+  },
+  "cat": {
+    "category": "Animals",
+    "difficulty": 2,
+    "minutes": 8,
+    "tools": ["pen"]
+  }
+}

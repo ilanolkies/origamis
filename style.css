@@ -521,10 +521,64 @@ body:has(.pad) {
   text-underline-offset: 6px;
 }
 
-.label .note {
-  margin-top: 8px;
-  color: var(--soft);
+.label .tag {
+  position: absolute;
+  top: -16px;
+  right: 16px;
+  padding: 1px 12px 2px;
+  font: 400 0.95rem var(--marker);
+  background: var(--blue);
+  border: 2.5px solid var(--ink);
+  border-radius: var(--scribble-flip);
+  transform: rotate(4deg);
+}
+
+.label .facts {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
   font-size: 1.05rem;
+}
+
+.label .facts b {
+  font: 400 1.4rem var(--marker);
+}
+
+.label .level {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 1.05rem;
+}
+
+.label .bar {
+  position: relative;
+  height: 16px;
+  overflow: hidden;
+  background: var(--sheet);
+  border: 2.5px solid var(--ink);
+  border-radius: 9px 4px 10px 5px / 5px 10px 4px 9px;
+}
+
+.label .bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(20% - 2px), var(--ink) calc(20% - 2px) 20%);
+}
+
+.label .fill {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(-45deg, var(--pink) 0 6px, #f9a3bf 6px 10px);
+}
+
+.label .needs {
+  margin-top: 4px;
+  color: var(--soft);
+  font-size: 1rem;
 }
 
 @media (hover: none) {

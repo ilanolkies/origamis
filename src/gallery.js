@@ -1,27 +1,45 @@
+import catalog from './models/catalog.json' with { type: 'json' }
 import { models } from './models/index.js'
 import { defs, renderFrame } from './sketch.js'
 import { buildTimeline } from './timeline.js'
 
 const BOIL_MS = 150
+const LEVELS = 5
 const gallery = document.querySelector('#gallery')
 const calm = matchMedia('(prefers-reduced-motion: reduce)')
 
 const pieces = models.map(model => {
   const timeline = buildTimeline(model)
   const items = timeline.steps.at(-1).after
-  return { model, steps: timeline.steps.length, frame: { view: timeline.fitView(items), items } }
+  return {
+    model,
+    facts: catalog[model.id],
+    steps: timeline.steps.length,
+    frame: { view: timeline.fitView(items), items },
+  }
 })
 
 document.body.insertAdjacentHTML('afterbegin', defs)
 gallery.innerHTML = pieces
   .map(
-    ({ model, steps }) => `
+    ({ model, facts, steps }) => `
       <a class="piece" href="fold.html?model=${model.id}">
         <svg viewBox="0 0 1 1" role="img" aria-label="${model.name}"></svg>
         <span class="label">
           <span class="kana" lang="ja">${model.kana}</span>
           <span class="name">${model.name}</span>
-          <span class="note">${model.parts.length} sheets · ${steps} steps</span>
+          <span class="tag">${facts.category}</span>
+          <span class="facts">
+            <span><b>${model.parts.length}</b> pieces</span>
+            <span><b>${steps}</b> steps</span>
+            <span><b>${facts.minutes}</b> min</span>
+          </span>
+          <span class="level" role="img" aria-label="Difficulty ${facts.difficulty} of ${LEVELS}">
+            <span>Difficulty</span>
+            <span class="bar"><span class="fill" style="width: ${(facts.difficulty / LEVELS) * 100}%"></span></span>
+            <span>${facts.difficulty}/${LEVELS}</span>
+          </span>
+          <span class="needs">${model.sheetCm} cm paper · ${facts.tools.join(', ')}</span>
         </span>
       </a>`,
   )
