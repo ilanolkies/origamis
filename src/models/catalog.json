@@ -12,7 +12,7 @@
     "minutes": 8,
     "tools": ["pen"],
     "place": {
-      "x": 1630,
+      "x": 1960,
       "y": 68,
       "tilt": -4
     }
@@ -138,7 +138,7 @@
     "minutes": 8,
     "tools": ["pen"],
     "place": {
-      "x": 1960,
+      "x": 2290,
       "y": 70,
       "tilt": 3
     }
@@ -147,7 +147,7 @@
     "minutes": 5,
     "tools": ["pen"],
     "place": {
-      "x": 2290,
+      "x": 2620,
       "y": 90,
       "tilt": -3
     }
@@ -195,6 +195,15 @@
       "x": 1034,
       "y": 82,
       "tilt": 3
+    }
+  },
+  "sunflower": {
+    "minutes": 4,
+    "tools": ["pen"],
+    "place": {
+      "x": 1364,
+      "y": 76,
+      "tilt": -3
     }
   }
 }
