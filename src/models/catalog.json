@@ -241,5 +241,32 @@
       "y": 2197,
       "tilt": -3
     }
+  },
+  "house": {
+    "minutes": 4,
+    "tools": ["none"],
+    "place": {
+      "x": 689,
+      "y": 2117,
+      "tilt": -2
+    }
+  },
+  "piano": {
+    "minutes": 6,
+    "tools": ["pen"],
+    "place": {
+      "x": 249,
+      "y": 2417,
+      "tilt": 4
+    }
+  },
+  "swan": {
+    "minutes": 6,
+    "tools": ["none"],
+    "place": {
+      "x": 1870,
+      "y": 300,
+      "tilt": -3
+    }
   }
 }

@@ -2,10 +2,24 @@ import { dot, length, sub } from '../geometry.js'
 import { draw } from './draw.js'
 import { crease, mountain, unfold, valley } from './fold.js'
 import { join } from './join.js'
+import { insideReverse, outsideReverse } from './reverse.js'
 import { rotate } from './rotate.js'
+import { squashAction } from './squash.js'
 import { turn } from './turn.js'
 
-export const actions = { valley, mountain, unfold, crease, draw, join, turn, rotate }
+export const actions = {
+  valley,
+  mountain,
+  unfold,
+  crease,
+  draw,
+  join,
+  turn,
+  rotate,
+  squash: squashAction,
+  'inside-reverse': insideReverse,
+  'outside-reverse': outsideReverse,
+}
 
 export const LEVELS = 9
 
