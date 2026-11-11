@@ -454,6 +454,7 @@ body:has(.sketchpad) {
   inset: 0;
   overflow: auto;
   cursor: grab;
+  touch-action: pan-x pan-y;
 }
 
 .sketchpad.panning {
@@ -568,6 +569,7 @@ body:has(.sketchpad) {
 }
 
 .label {
+  zoom: calc(1 / var(--zoom, 1));
   position: fixed;
   left: var(--x, 0);
   top: var(--y, 0);

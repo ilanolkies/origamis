@@ -5,6 +5,7 @@ import { categoryOf, models } from './models/index.js'
 import { defs, renderFrame } from './sketch.js'
 import { buildTimeline } from './timeline.js'
 import { createViewer } from './viewer.js'
+import { enableZoom } from './zoom.js'
 
 const BOIL_MS = 150
 const PIECE_SIZE = 440
@@ -91,6 +92,7 @@ sketchpad.innerHTML = `
 
 sketchpad.scrollLeft = MARGIN - 20
 sketchpad.scrollTop = MARGIN - 20
+enableZoom(sketchpad, sketchpad.querySelector('.world'))
 
 const outline = items => {
   const points = items
