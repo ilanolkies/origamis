@@ -18,6 +18,7 @@ import { iceCream } from './food/ice-cream.js'
 import { nigiri } from './food/nigiri.js'
 import { onigiri } from './food/onigiri.js'
 import { watermelon } from './food/watermelon.js'
+import { butterfly } from './insects/butterfly.js'
 import { cicada } from './insects/cicada.js'
 import { christmasTree } from './seasonal/christmas-tree.js'
 import { fuji } from './seasonal/fuji.js'
@@ -37,7 +38,7 @@ export const categories = {
   Food: [watermelon, onigiri, carrot, iceCream, nigiri],
   Vehicles: [sailboat, rocket],
   Seasonal: [fuji, christmasTree, snowman, heart],
-  Insects: [cicada],
+  Insects: [cicada, butterfly],
   Things: [helmet, cup, house, piano],
 }
 
