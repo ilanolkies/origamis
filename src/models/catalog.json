@@ -133,5 +133,23 @@
       "y": 740,
       "tilt": -2
     }
+  },
+  "dog": {
+    "minutes": 8,
+    "tools": ["pen"],
+    "place": {
+      "x": 900,
+      "y": 70,
+      "tilt": 3
+    }
+  },
+  "whale": {
+    "minutes": 5,
+    "tools": ["pen"],
+    "place": {
+      "x": 1000,
+      "y": 380,
+      "tilt": -3
+    }
   }
 }

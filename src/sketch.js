@@ -17,6 +17,7 @@ const TONES = {
   rocket: [226, 74, 74],
   fins: [86, 128, 196],
   fuji: [78, 110, 178],
+  whale: [70, 130, 180],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]
