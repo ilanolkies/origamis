@@ -10,11 +10,17 @@ export const actions = { valley, mountain, draw, join, turn, rotate }
 export const LEVELS = 9
 
 const RECTANGLE_LEVEL = 1
+const ASSEMBLY_LEVEL = 2
+const PAIR = 2
+
+const stepKinds = steps => steps.flatMap(step => step.actions.map(action => action.kind))
 
 export const kindsOf = model => [
-  ...model.parts.flatMap(part => part.steps.flatMap(step => step.actions.map(action => action.kind))),
-  ...(model.finish ? ['join'] : []),
+  ...model.parts.flatMap(part => stepKinds(part.steps)),
+  ...stepKinds(model.assembly?.steps ?? []),
 ]
+
+export const piecesOf = model => model.parts.reduce((count, part) => count + (part.copies ?? 1), 0)
 
 export const isSquare = corners =>
   corners.length === 4 &&
@@ -27,5 +33,9 @@ export const isSquare = corners =>
 
 const sheetLevel = model => (isSquare(model.sheet) ? 0 : RECTANGLE_LEVEL)
 
+const repeats = model => model.parts.some(part => (part.copies ?? 1) > 1)
+
+const assemblyLevel = model => (piecesOf(model) > PAIR || repeats(model) ? ASSEMBLY_LEVEL : 0)
+
 export const difficultyOf = model =>
-  1 + Math.max(sheetLevel(model), ...kindsOf(model).map(kind => actions[kind].level))
+  1 + Math.max(sheetLevel(model), assemblyLevel(model), ...kindsOf(model).map(kind => actions[kind].level))

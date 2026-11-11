@@ -1,4 +1,4 @@
-import { add, bounds, lerp } from './geometry.js'
+import { add, apply, bounds, lerp, polar } from './geometry.js'
 
 export const ease = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
 export const settle = t => 1 + 2.70158 * (t - 1) ** 3 + 1.70158 * (t - 1) ** 2
@@ -12,6 +12,22 @@ export const shifted = (items, offset, opacity = 1) =>
       ? { ...item, strokes: item.strokes.map(stroke => stroke.map(p => add(p, offset))), opacity }
       : { ...item, poly: item.poly.map(p => add(p, offset)), opacity },
   )
+
+export const placement = ({ seat = [0, 0], rotate = 0, mirror = false, scale = 1 }) => {
+  const [c, s] = polar(rotate, scale)
+  const flip = mirror ? -1 : 1
+  return [c * flip, -s, seat[0], s * flip, c, seat[1]]
+}
+
+export const placed = (items, where) => {
+  const matrix = placement(where)
+  const move = p => apply(matrix, p)
+  return items.map(item =>
+    item.type === 'doodle'
+      ? { ...item, strokes: item.strokes.map(stroke => stroke.map(move)) }
+      : { ...item, poly: item.poly.map(move) },
+  )
+}
 
 export const fitView = items => {
   const box = bounds(items.filter(item => item.poly))

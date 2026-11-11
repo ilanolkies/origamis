@@ -6,6 +6,7 @@ import { rabbit } from './animal-faces/rabbit.js'
 import { cat } from './animals/cat.js'
 import { dog } from './animals/dog.js'
 import { whale } from './animals/whale.js'
+import { cherryBlossom } from './flowers/cherry-blossom.js'
 import { leaf } from './flowers/leaf.js'
 import { stem } from './flowers/stem.js'
 import { tulip } from './flowers/tulip.js'
@@ -14,17 +15,19 @@ import { iceCream } from './food/ice-cream.js'
 import { nigiri } from './food/nigiri.js'
 import { onigiri } from './food/onigiri.js'
 import { watermelon } from './food/watermelon.js'
+import { christmasTree } from './seasonal/christmas-tree.js'
 import { fuji } from './seasonal/fuji.js'
+import { snowman } from './seasonal/snowman.js'
 import { rocket } from './vehicles/rocket.js'
 import { sailboat } from './vehicles/sailboat.js'
 
 export const categories = {
-  Flowers: [tulip, leaf, stem],
+  Flowers: [tulip, leaf, stem, cherryBlossom],
   Animals: [cat, dog, whale],
   'Animal faces': [catFace, dogFace, fox, rabbit, pig],
   Food: [watermelon, onigiri, carrot, iceCream, nigiri],
   Vehicles: [sailboat, rocket],
-  Seasonal: [fuji],
+  Seasonal: [fuji, christmasTree, snowman],
 }
 
 export const models = Object.values(categories).flat()

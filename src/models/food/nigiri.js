@@ -82,12 +82,15 @@ export const nigiri = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'rice',
-    top: 'fish',
-    seat: [0, FISH + SEAT],
-    text: 'Lay the fish over the top half of the rice, so the rice shows below it. A dab of glue keeps it in place.',
+    base: { part: 'rice' },
+    steps: [
+      {
+        text: 'Lay the fish over the top half of the rice, so the rice shows below it. A dab of glue keeps it in place.',
+        actions: [{ kind: 'join', part: 'fish', seat: [0, FISH + SEAT] }],
+      },
+    ],
   },
 }

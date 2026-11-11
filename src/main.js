@@ -1,4 +1,4 @@
-import { difficultyOf, LEVELS } from './actions/index.js'
+import { difficultyOf, LEVELS, piecesOf } from './actions/index.js'
 import catalog from './models/catalog.json' with { type: 'json' }
 import categories from './models/categories.json' with { type: 'json' }
 import { categoryOf, models } from './models/index.js'
@@ -61,7 +61,7 @@ const card = ({ model, facts, difficulty, steps }) => `
           <span class="name">${model.name}</span>
           <span class="tag">${categoryOf(model)}</span>
           <span class="facts">
-            <span>${plural(model.parts.length, 'piece')}</span>
+            <span>${plural(piecesOf(model), 'piece')}</span>
             <span>${plural(steps, 'step')}</span>
             <span><b>${facts.minutes}</b> min</span>
           </span>

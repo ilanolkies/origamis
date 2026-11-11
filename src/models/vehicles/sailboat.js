@@ -42,12 +42,15 @@ export const sailboat = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'sail',
-    top: 'hull',
-    seat: [MAST, DEPTH - 1],
-    text: `Glue the hull over the bottom ${cm(DEPTH)} cm of the sail, with the sail's fold standing upright a little left of the middle.`,
+    base: { part: 'sail' },
+    steps: [
+      {
+        text: `Glue the hull over the bottom ${cm(DEPTH)} cm of the sail, with the sail's fold standing upright a little left of the middle.`,
+        actions: [{ kind: 'join', part: 'hull', seat: [MAST, DEPTH - 1] }],
+      },
+    ],
   },
 }

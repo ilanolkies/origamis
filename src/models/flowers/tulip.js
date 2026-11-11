@@ -90,12 +90,15 @@ export const tulip = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'stem',
-    top: 'bloom',
-    seat: [0.02, 1 - SEAT_DEPTH],
-    text: `Snip 2 mm off the bottom tip of the bloom and slide the stem's point about ${Math.round(SEAT_DEPTH * CM)} cm into the slot. A dab of glue works too.`,
+    base: { part: 'stem' },
+    steps: [
+      {
+        text: `Snip 2 mm off the bottom tip of the bloom and slide the stem's point about ${Math.round(SEAT_DEPTH * CM)} cm into the slot. A dab of glue works too.`,
+        actions: [{ kind: 'join', part: 'bloom', seat: [0.02, 1 - SEAT_DEPTH] }],
+      },
+    ],
   },
 }

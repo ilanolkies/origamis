@@ -75,12 +75,15 @@ export const iceCream = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'scoop',
-    top: 'cone',
-    seat: [0, FLAT + OVERLAP - RIM],
-    text: `Lay the cone over the bottom of the scoop so about ${Math.round(OVERLAP * CM)} cm of the scoop tucks behind it. A dab of glue keeps it in place.`,
+    base: { part: 'scoop' },
+    steps: [
+      {
+        text: `Lay the cone over the bottom of the scoop so about ${Math.round(OVERLAP * CM)} cm of the scoop tucks behind it. A dab of glue keeps it in place.`,
+        actions: [{ kind: 'join', part: 'cone', seat: [0, FLAT + OVERLAP - RIM] }],
+      },
+    ],
   },
 }

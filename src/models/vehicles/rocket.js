@@ -70,12 +70,15 @@ export const rocket = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'fins',
-    top: 'body',
-    seat: [0, -BASE - DROP],
-    text: 'Glue the body over the middle of the fins, its bottom edge level with theirs.',
+    base: { part: 'fins' },
+    steps: [
+      {
+        text: 'Glue the body over the middle of the fins, its bottom edge level with theirs.',
+        actions: [{ kind: 'join', part: 'body', seat: [0, -BASE - DROP] }],
+      },
+    ],
   },
 }

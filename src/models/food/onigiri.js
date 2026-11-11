@@ -70,12 +70,15 @@ export const onigiri = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'rice',
-    top: 'nori',
-    seat: [-WIDTH / 2, BAND - WRAP + SHOULDER],
-    text: 'Wrap the strip over the bottom middle of the rice ball, so it pokes out a little below. A dab of glue keeps it in place.',
+    base: { part: 'rice' },
+    steps: [
+      {
+        text: 'Wrap the strip over the bottom middle of the rice ball, so it pokes out a little below. A dab of glue keeps it in place.',
+        actions: [{ kind: 'join', part: 'nori', seat: [-WIDTH / 2, BAND - WRAP + SHOULDER] }],
+      },
+    ],
   },
 }
