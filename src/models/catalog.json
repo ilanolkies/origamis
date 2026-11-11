@@ -88,5 +88,23 @@
       "y": 90,
       "tilt": -2
     }
+  },
+  "sailboat": {
+    "minutes": 3,
+    "tools": ["glue"],
+    "place": {
+      "x": 1400,
+      "y": 580,
+      "tilt": 3
+    }
+  },
+  "rocket": {
+    "minutes": 5,
+    "tools": ["pen", "glue"],
+    "place": {
+      "x": 1730,
+      "y": 570,
+      "tilt": -3
+    }
   }
 }
