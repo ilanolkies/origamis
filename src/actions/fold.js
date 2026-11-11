@@ -26,6 +26,7 @@ const LIGHT = [0.22, -0.28]
 const SOUNDS = ['パタッ', 'ペタッ', 'スッ', 'キュッ']
 
 const LAYERED = 4
+const TUCKED = 5
 const PROBE = 1e-3
 
 const lifted = (faces, { from, to, mover, layers }, sign, mirror) => {
@@ -58,13 +59,23 @@ const lifted = (faces, { from, to, mover, layers }, sign, mirror) => {
   return picked
 }
 
+const pocketOf = (stays, landed, hinges, { kind, into = 0 }) => {
+  const valley = kind === 'valley'
+  const covered = stays.map((_, i) => i).filter(i => landed.some(flap => overlaps(stays[i].poly, flap.poly)))
+  const passed = (valley ? covered.reverse() : covered).slice(0, into === 'inside' ? Infinity : into)
+  if (!passed.length) return valley ? stays.length : 0
+  if (valley) return Math.max(passed.at(-1), ...hinges.map(i => i + 1))
+  return Math.min(passed.at(-1) + 1, ...hinges)
+}
+
 export const fold = (faces, crease) => {
-  const { from, to, mover, kind } = crease
+  const { from, to, mover } = crease
   const sign = cross(sub(to, from), sub(mover, from)) > 0 ? 1 : -1
   const mirror = reflection(from, to)
   const picked = lifted(faces, crease, sign, mirror)
   const stays = []
   const moving = []
+  const hinges = []
   faces.forEach((face, i) => {
     if (!picked.has(i)) {
       stays.push(face)
@@ -74,6 +85,7 @@ export const fold = (faces, crease) => {
     const move = clip(face.poly, from, to, sign)
     if (stay) stays.push({ ...face, poly: stay })
     if (move) moving.push({ ...face, poly: move })
+    if (stay && move) hinges.push(stays.length - 1)
   })
   const landed = moving
     .map(face => ({
@@ -82,8 +94,10 @@ export const fold = (faces, crease) => {
       colorUp: !face.colorUp,
     }))
     .reverse()
+  const at = pocketOf(stays, landed, hinges, crease)
   return {
-    faces: kind === 'valley' ? [...stays, ...landed] : [...landed, ...stays],
+    faces: [...stays.slice(0, at), ...landed, ...stays.slice(at)],
+    at,
     stays,
     moving,
     layers: faces.filter((_, i) => picked.has(i)),
@@ -134,10 +148,13 @@ const swingPhase = (before, crease, paper) => {
         polys: swung.map(({ points }) => points.map(({ flat, height }) => add(flat, scale(LIGHT, height)))),
         opacity: 0.3 * tilt,
       }
-      return {
-        view: mixView(viewFrom, viewTo, ease(t)),
-        items: lift > 0 ? [...stays, line, cast, ...movers] : [...movers, ...stays, line],
-      }
+      const tucked = crease.into && flipped
+      const items = tucked
+        ? [...stays.slice(0, result.at), cast, ...movers, ...stays.slice(result.at), line]
+        : lift > 0
+          ? [...stays, line, cast, ...movers]
+          : [...movers, ...stays, line]
+      return { view: mixView(viewFrom, viewTo, ease(t)), items }
     },
   }
 }
@@ -152,7 +169,7 @@ const foldMarks = (paper, action) => {
   )
   return [
     { type: 'crease', from, to, kind: action.kind },
-    { type: 'arrow', from: action.mover, control, to: target },
+    { type: 'arrow', from: action.mover, control, to: target, under: Boolean(action.into) },
   ]
 }
 
@@ -200,7 +217,10 @@ export const moveFolds = (folds = [], m, moveFaces) =>
     },
   }))
 
-const layered = base => action => (action.layers === undefined ? base : Math.max(base, LAYERED))
+const layered = base => action => {
+  if (action.into) return TUCKED
+  return action.layers === undefined ? base : Math.max(base, LAYERED)
+}
 
 const folding = { level: layered(0), perform: performFold, marks: foldMarks }
 

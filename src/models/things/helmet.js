@@ -5,7 +5,7 @@ const RIM = -0.5
 
 const sideDown = side => ({ from: [0, 0], to: [side, -1], mover: [side, 0], kind: 'valley', bend: -side })
 const horn = side => ({ from: [0, RIM], to: [side * 0.15, -0.15], mover: [side * 0.02, -0.06], kind: 'valley', bend: side, layers: 'top' })
-const across = (height, mover, kind, layers) => ({ from: [-1, height], to: [1, height], mover, kind, bend: 1, layers })
+const across = (height, mover, kind, layers, into) => ({ from: [-1, height], to: [1, height], mover, kind, bend: 1, layers, into })
 
 export const helmet = {
   id: 'helmet',
@@ -46,8 +46,8 @@ export const helmet = {
           actions: [across(RIM, [0, BRIM], 'valley', 'top')],
         },
         {
-          text: 'Fold the last bottom corner up behind.',
-          actions: [across(RIM, [0, -1], 'mountain', 'bottom')],
+          text: 'Fold the last bottom corner up and tuck it inside the helmet.',
+          actions: [across(RIM, [0, -1], 'valley', 'bottom', 'inside')],
         },
       ],
     },

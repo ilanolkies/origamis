@@ -29,9 +29,11 @@ const TONES = {
   cicada: [112, 150, 72],
   helmet: [104, 88, 164],
   heart: [226, 72, 100],
+  cup: [86, 164, 214],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]
+const UNDER = 0.6
 
 const number = v => v.toFixed(4)
 const point = p => `${number(p[0])} ${number(-p[1])}`
@@ -108,10 +110,15 @@ const draw = {
     const across = [-heading[1], heading[0]]
     const barb = Math.min(wobble * 9, length(sub(item.to, item.from)) * 0.4)
     const back = sub(item.to, scale(heading, barb))
-    const jitter = scale(across, wobble * noise(seed))
+    const control = add(item.control, scale(across, wobble * noise(seed)))
+    const head = `M${point(add(back, scale(across, barb * 0.55)))}L${point(item.to)}L${point(sub(back, scale(across, barb * 0.55)))}`
+    if (!item.under) return `<path class="guide" d="M${point(item.from)}Q${point(control)} ${point(item.to)}${head}"/>`
+    const near = lerp(item.from, control, UNDER)
+    const far = lerp(control, item.to, UNDER)
+    const split = lerp(near, far, UNDER)
     return (
-      `<path class="guide" d="M${point(item.from)}Q${point(add(item.control, jitter))} ${point(item.to)}` +
-      `M${point(add(back, scale(across, barb * 0.55)))}L${point(item.to)}L${point(sub(back, scale(across, barb * 0.55)))}"/>`
+      `<path class="guide" d="M${point(item.from)}Q${point(near)} ${point(split)}${head}"/>` +
+      `<path class="guide under" d="M${point(split)}Q${point(far)} ${point(item.to)}"/>`
     )
   },
 }

@@ -173,6 +173,10 @@ h1 span {
   vector-effect: non-scaling-stroke;
 }
 
+.guide.under {
+  stroke-dasharray: 7 6;
+}
+
 .guide.pencil {
   stroke-width: 2;
   stroke-dasharray: 2 5;

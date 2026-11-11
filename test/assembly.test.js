@@ -128,7 +128,7 @@ const EXISTING = {
   'cat-face': 1, 'dog-face': 1, 'fox-face': 1, 'rabbit-face': 1, 'pig-face': 1,
   watermelon: 2, onigiri: 1, carrot: 1, 'ice-cream': 2, nigiri: 2,
   sailboat: 1, rocket: 1, fuji: 1, sunflower: 4,
-  cicada: 5, helmet: 5, heart: 5,
+  cicada: 5, helmet: 6, heart: 5, cup: 6,
 }
 
 test('existing models keep their difficulty', () => {
