@@ -1,48 +1,48 @@
-import { cm, DIAMOND, SIDE_CM } from '../shapes.js'
+import { cm, HALF_SHEET, HALF_SHEET_CM, LONG, SHORT } from '../shapes.js'
 
-const RIND = 0.15
-const SIDE = 0.85
-const BOTTOM = -0.85
+const RIND = 0.1
+const BASE = RIND - SHORT
 
 const seed = ([x, y]) => [[x, y + 0.04], [x - 0.022, y - 0.005], [x, y - 0.03], [x + 0.022, y - 0.005], [x, y + 0.04]]
 
 const seeds = [
-  [-0.45, -0.02],
-  [0, -0.04],
-  [0.45, -0.02],
-  [-0.22, -0.28],
-  [0.22, -0.28],
-  [0, -0.48],
+  [-0.3, -0.07],
+  [0, -0.07],
+  [0.3, -0.07],
+  [-0.15, 0.06],
+  [0.15, 0.06],
+  [0, 0.18],
 ].map(seed)
 
 export const watermelon = {
   id: 'watermelon',
   name: 'Watermelon',
   kana: 'すいか',
-  sheet: DIAMOND,
-  sheetCm: SIDE_CM,
+  sheet: HALF_SHEET,
+  paper: `${HALF_SHEET_CM} paper`,
   parts: [
     {
       id: 'slice',
       name: 'Slice',
       kanji: '西瓜',
       tone: 'melon',
-      paper: `${SIDE_CM} cm square, red on one side`,
+      back: 'rind',
+      paper: `${HALF_SHEET_CM} rectangle, red on one side, green on the other`,
       steps: [
         {
-          text: `White side up, a corner toward you. Fold the top corner down, stopping ${cm(2 * RIND)} cm short of the bottom corner. The white border is the rind.`,
-          actions: [{ from: [-1, RIND], to: [1, RIND], mover: [0, 1], kind: 'valley', bend: -1 }],
+          text: `Green side up, a long edge toward you. Fold the bottom edge behind by ${cm(RIND)} cm.`,
+          actions: [{ from: [-1, BASE], to: [1, BASE], mover: [0, -SHORT], kind: 'mountain', bend: 1 }],
         },
         {
-          text: `Fold the side corners behind along upright creases ${cm(1 - SIDE)} cm in from the tips.`,
+          text: 'Turn the paper over. The green strip along the bottom is the rind.',
+          actions: [{ kind: 'turn' }],
+        },
+        {
+          text: `Fold the top corners behind along creases from ${cm(RIND)} cm either side of the middle of the top edge to the ends of the rind.`,
           actions: [
-            { from: [-SIDE, 0], to: [-SIDE, 1], mover: [-1, 0], kind: 'mountain', bend: 1 },
-            { from: [SIDE, 0], to: [SIDE, 1], mover: [1, 0], kind: 'mountain', bend: -1 },
+            { from: [-RIND, SHORT], to: [-LONG, BASE], mover: [-LONG, SHORT], kind: 'mountain', bend: 1 },
+            { from: [RIND, SHORT], to: [LONG, BASE], mover: [LONG, SHORT], kind: 'mountain', bend: -1 },
           ],
-        },
-        {
-          text: `Fold the bottom tip behind, ${cm(1 + BOTTOM)} cm up from the point.`,
-          actions: [{ from: [-1, BOTTOM], to: [1, BOTTOM], mover: [0, -1], kind: 'mountain', bend: 1 }],
         },
         {
           text: 'Draw the seeds.',

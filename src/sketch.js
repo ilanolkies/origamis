@@ -9,9 +9,13 @@ const TONES = {
   rabbit: [170, 166, 196],
   pig: [247, 158, 176],
   melon: [234, 84, 92],
+  rind: [74, 150, 82],
   rice: [236, 230, 214],
   nori: [52, 74, 60],
+  salmon: [246, 130, 92],
   carrot: [242, 134, 46],
+  cream: [248, 180, 204],
+  cone: [218, 162, 96],
   sail: [236, 92, 72],
   wood: [176, 118, 72],
   rocket: [226, 74, 74],
@@ -32,7 +36,7 @@ const noise = n => {
 }
 
 const colour = item => {
-  const base = item.colorUp ? TONES[item.tone] : TONES.paper
+  const base = TONES[item.colorUp ? item.tone : (item.back ?? 'paper')]
   return `rgb(${base.map(v => Math.round(v * (item.shade ?? 1))).join(' ')})`
 }
 

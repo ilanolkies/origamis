@@ -70,7 +70,7 @@ const card = ({ model, facts, difficulty, steps }) => `
             <span class="bar"><span class="fill" style="width: ${(difficulty / LEVELS) * 100}%"></span></span>
             <span>${difficulty}/${LEVELS}</span>
           </span>
-          <span class="needs">${model.sheetCm} cm paper · ${facts.tools.join(', ')}</span>
+          <span class="needs">${model.paper ?? `${model.sheetCm} cm paper`} · ${facts.tools.join(', ')}</span>
         </span>
       </a>`
 

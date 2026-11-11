@@ -40,7 +40,7 @@ export const fold = (faces, { from, to, mover, kind }) => {
   return { faces: kind === 'valley' ? [...stays, ...landed] : [...landed, ...stays], stays, moving }
 }
 
-const swingPhase = (before, crease, tone) => {
+const swingPhase = (before, crease, { tone, back }) => {
   const result = fold(before, crease)
   const axis = unit(sub(crease.to, crease.from))
   const viewFrom = fitView(before)
@@ -48,7 +48,7 @@ const swingPhase = (before, crease, tone) => {
   const eye = lerp(viewFrom.center, viewTo.center, 0.5)
   const lift = crease.kind === 'valley' ? 1 : -1
   const [lineFrom, lineTo] = creaseSegment(before, crease.from, crease.to)
-  const stays = scene(result.stays, tone)
+  const stays = scene(result.stays, { tone, back })
 
   const swing = (p, angle) => {
     const foot = add(crease.from, scale(axis, dot(sub(p, crease.from), axis)))
@@ -73,6 +73,7 @@ const swingPhase = (before, crease, tone) => {
         poly: points.map(project),
         colorUp: flipped ? !face.colorUp : face.colorUp,
         tone,
+        back,
         shade: 1 - tilt * (flipped ? 0.3 : 0.12),
       }))
       if (flipped) movers.reverse()
@@ -93,7 +94,7 @@ const swingPhase = (before, crease, tone) => {
 const crease = {
   level: 0,
   perform: (paper, action) => {
-    const phase = swingPhase(paper.faces, action, paper.tone)
+    const phase = swingPhase(paper.faces, action, paper)
     return { paper: { ...paper, faces: phase.after }, phase }
   },
   marks: (paper, action) => {
