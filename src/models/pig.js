@@ -28,23 +28,23 @@ export const pig = {
       steps: [
         {
           text: 'White side up, a corner toward you. Fold the top corner down to the bottom corner.',
-          folds: [HALVE_DOWN],
+          actions: [HALVE_DOWN],
         },
         {
           text: `Fold the bottom point behind. The crease sits ${cm(1 + CHIN)} cm above the tip.`,
-          folds: [{ from: [-1, CHIN], to: [1, CHIN], mover: [0, -1], kind: 'mountain', bend: 1 }],
+          actions: [{ from: [-1, CHIN], to: [1, CHIN], mover: [0, -1], kind: 'mountain', bend: 1 }],
         },
         {
           text: `Fold the left corner down to make a small ear. The crease runs from ${cm(-EAR_TOP[0])} cm left of the middle of the top edge to a spot ${cm(-EAR_EDGE[1])} cm down the left edge.`,
-          folds: [{ from: EAR_TOP, to: EAR_EDGE, mover: [-1, 0], kind: 'valley', bend: 1 }],
+          actions: [{ from: EAR_TOP, to: EAR_EDGE, mover: [-1, 0], kind: 'valley', bend: 1 }],
         },
         {
           text: 'Repeat on the right. The two ears should hang level.',
-          folds: [{ from: mirror(EAR_TOP), to: mirror(EAR_EDGE), mover: [1, 0], kind: 'valley', bend: -1 }],
+          actions: [{ from: mirror(EAR_TOP), to: mirror(EAR_EDGE), mover: [1, 0], kind: 'valley', bend: -1 }],
         },
         {
           text: 'Draw the face: two eyes and a round snout with two nostrils.',
-          draw: face,
+          actions: [{ kind: 'draw', strokes: face }],
         },
       ],
     },

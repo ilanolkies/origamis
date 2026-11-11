@@ -1,4 +1,4 @@
-import { add, length, polar, sub } from '../fold.js'
+import { add, length, polar, sub } from '../geometry.js'
 
 const SIDE_CM = 15
 const CM = SIDE_CM / Math.SQRT2
@@ -49,23 +49,23 @@ const head = {
   steps: [
     {
       text: 'White side up, a corner toward you. Fold the bottom corner up to the top corner.',
-      folds: [HALVE],
+      actions: [HALVE],
     },
     {
       text: `Fold the top point behind. The crease sits ${cm(1 - BROW)} cm below the tip.`,
-      folds: [{ from: [-1, BROW], to: [1, BROW], mover: [0, 1], kind: 'mountain', bend: 1 }],
+      actions: [{ from: [-1, BROW], to: [1, BROW], mover: [0, 1], kind: 'mountain', bend: 1 }],
     },
     {
       text: `Fold the right corner up behind to make an ear. The crease runs from the middle of the bottom edge to a spot ${cm(length(sub([1, 0], cheek)))} cm up the right edge.`,
-      folds: [{ from: CENTRE, to: cheek, mover: [1, 0], kind: 'mountain', bend: -1 }],
+      actions: [{ from: CENTRE, to: cheek, mover: [1, 0], kind: 'mountain', bend: -1 }],
     },
     {
       text: 'Repeat on the left. The two ears should sit level.',
-      folds: [{ from: CENTRE, to: mirror(cheek), mover: [-1, 0], kind: 'mountain', bend: 1 }],
+      actions: [{ from: CENTRE, to: mirror(cheek), mover: [-1, 0], kind: 'mountain', bend: 1 }],
     },
     {
       text: 'Draw the face: happy eyes, a nose, whiskers and three stripes.',
-      draw: face,
+      actions: [{ kind: 'draw', strokes: face }],
     },
   ],
 }
@@ -87,17 +87,17 @@ export const cat = {
       steps: [
         {
           text: 'New sheet, white side up, a corner toward you. Fold the bottom corner up to the top corner.',
-          folds: [HALVE],
+          actions: [HALVE],
         },
         {
           text: `Fold the right corner up to make the tail. Start the crease ${cm(TAIL_START[0])} cm right of the middle of the bottom edge and slant it up to the right edge.`,
-          folds: [
+          actions: [
             { from: TAIL_START, to: add(TAIL_START, polar(TAIL_ANGLE)), mover: [1, 0], kind: 'valley', bend: -1 },
           ],
         },
         {
           text: `Fold the left corner behind along an upright crease ${cm(1 + CHEST)} cm from the tip.`,
-          folds: [{ from: [CHEST, 0], to: [CHEST, 1], mover: [-1, 0], kind: 'mountain', bend: 1 }],
+          actions: [{ from: [CHEST, 0], to: [CHEST, 1], mover: [-1, 0], kind: 'mountain', bend: 1 }],
         },
       ],
     },

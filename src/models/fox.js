@@ -1,4 +1,4 @@
-import { length, polar, sub } from '../fold.js'
+import { length, polar, sub } from '../geometry.js'
 import { CENTRE, cm, DIAMOND, edgeReach, HALVE_UP, mirror, SIDE_CM } from './shapes.js'
 
 const BROW = 0.5
@@ -29,23 +29,23 @@ export const fox = {
       steps: [
         {
           text: 'White side up, a corner toward you. Fold the bottom corner up to the top corner.',
-          folds: [HALVE_UP],
+          actions: [HALVE_UP],
         },
         {
           text: `Fold the top point behind. The crease sits ${cm(1 - BROW)} cm below the tip.`,
-          folds: [{ from: [-1, BROW], to: [1, BROW], mover: [0, 1], kind: 'mountain', bend: 1 }],
+          actions: [{ from: [-1, BROW], to: [1, BROW], mover: [0, 1], kind: 'mountain', bend: 1 }],
         },
         {
           text: `Fold the right corner up to make an ear. The crease runs from the middle of the bottom edge to a spot ${cm(length(sub([1, 0], cheek)))} cm up the right edge.`,
-          folds: [{ from: CENTRE, to: cheek, mover: [1, 0], kind: 'valley', bend: -1 }],
+          actions: [{ from: CENTRE, to: cheek, mover: [1, 0], kind: 'valley', bend: -1 }],
         },
         {
           text: 'Repeat on the left. The two ears should stand level.',
-          folds: [{ from: CENTRE, to: mirror(cheek), mover: [-1, 0], kind: 'valley', bend: 1 }],
+          actions: [{ from: CENTRE, to: mirror(cheek), mover: [-1, 0], kind: 'valley', bend: 1 }],
         },
         {
           text: 'Draw the face: narrow eyes, a small black nose and whiskers.',
-          draw: face,
+          actions: [{ kind: 'draw', strokes: face }],
         },
       ],
     },

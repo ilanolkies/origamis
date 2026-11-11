@@ -54,7 +54,7 @@ export const bounds = faces => {
   return { minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) }
 }
 
-const clip = (poly, from, to, sign) => {
+export const clip = (poly, from, to, sign) => {
   const d = sub(to, from)
   const out = []
   poly.forEach((a, i) => {
@@ -72,27 +72,6 @@ const clip = (poly, from, to, sign) => {
 }
 
 export const sheet = corners => [{ poly: corners, matrix: IDENTITY, colorUp: false }]
-
-export const fold = (faces, { from, to, mover, kind }) => {
-  const sign = cross(sub(to, from), sub(mover, from)) > 0 ? 1 : -1
-  const mirror = reflection(from, to)
-  const stays = []
-  const moving = []
-  for (const face of faces) {
-    const stay = clip(face.poly, from, to, -sign)
-    const move = clip(face.poly, from, to, sign)
-    if (stay) stays.push({ ...face, poly: stay })
-    if (move) moving.push({ ...face, poly: move })
-  }
-  const landed = moving
-    .map(face => ({
-      poly: face.poly.map(p => apply(mirror, p)),
-      matrix: compose(mirror, face.matrix),
-      colorUp: !face.colorUp,
-    }))
-    .reverse()
-  return { faces: kind === 'valley' ? [...stays, ...landed] : [...landed, ...stays], stays, moving }
-}
 
 const strictlyInside = (poly, point) => {
   const ring = counterClockwise(poly)

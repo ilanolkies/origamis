@@ -1,3 +1,4 @@
+import { difficultyOf, LEVELS } from './actions/index.js'
 import catalog from './models/catalog.json' with { type: 'json' }
 import categories from './models/categories.json' with { type: 'json' }
 import { models } from './models/index.js'
@@ -6,7 +7,6 @@ import { buildTimeline } from './timeline.js'
 import { createViewer } from './viewer.js'
 
 const BOIL_MS = 150
-const LEVELS = 5
 const PIECE_SIZE = 440
 const MARGIN = 400
 const DRAG_THRESHOLD = 6
@@ -44,6 +44,7 @@ const pieces = models.map(model => {
   return {
     model,
     facts: catalog[model.id],
+    difficulty: difficultyOf(model),
     steps: timeline.steps.length,
     frame: { view: timeline.fitView(items), items },
   }
@@ -52,7 +53,7 @@ const pieces = models.map(model => {
 const plural = (count, word) => `<b>${count}</b> ${word}${count === 1 ? '' : 's'}`
 const at = ({ x, y }) => `left: ${x + MARGIN}px; top: ${y + MARGIN}px`
 
-const card = ({ model, facts, steps }) => `
+const card = ({ model, facts, difficulty, steps }) => `
       <a class="piece" href="?model=${model.id}" data-model="${model.id}" style="${at(facts.place)}; --tilt: ${facts.place.tilt}deg">
         <svg viewBox="0 0 1 1" role="img" aria-label="${model.name}"></svg>
         <span class="label">
@@ -64,10 +65,10 @@ const card = ({ model, facts, steps }) => `
             <span>${plural(steps, 'step')}</span>
             <span><b>${facts.minutes}</b> min</span>
           </span>
-          <span class="level" role="img" aria-label="Difficulty ${facts.difficulty} of ${LEVELS}">
+          <span class="level" role="img" aria-label="Difficulty ${difficulty} of ${LEVELS}">
             <span>Difficulty</span>
-            <span class="bar"><span class="fill" style="width: ${(facts.difficulty / LEVELS) * 100}%"></span></span>
-            <span>${facts.difficulty}/${LEVELS}</span>
+            <span class="bar"><span class="fill" style="width: ${(difficulty / LEVELS) * 100}%"></span></span>
+            <span>${difficulty}/${LEVELS}</span>
           </span>
           <span class="needs">${model.sheetCm} cm paper · ${facts.tools.join(', ')}</span>
         </span>

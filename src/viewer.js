@@ -1,12 +1,6 @@
 import { renderFrame, thumbnail } from './sketch.js'
 import { buildTimeline } from './timeline.js'
 
-const SOUNDS = {
-  fold: ['パタッ', 'ペタッ', 'スッ', 'キュッ'],
-  swap: ['シュッ'],
-  join: ['ポンッ'],
-  draw: ['カキカキ'],
-}
 const BOIL_MS = 150
 
 const sections = timeline =>
@@ -74,8 +68,7 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
     describe(position + 1)
   }
 
-  const shout = kind => {
-    const words = SOUNDS[kind]
+  const shout = words => {
     const word = document.createElement('span')
     word.className = 'shout'
     word.textContent = words[Math.floor(Math.random() * words.length)]
@@ -108,7 +101,7 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
       if (!calm.matches) boil = Math.floor(now / BOIL_MS)
       paint(phase.frame(backward ? 1 - t : t))
       if (t < 1) return requestAnimationFrame(tick)
-      if (!backward && !sweeping) shout(phase.kind)
+      if (!backward && !sweeping) shout(phase.sounds)
       active++
       started = null
       if (active < phases.length) return requestAnimationFrame(tick)
