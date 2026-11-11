@@ -30,19 +30,19 @@ export const dog = {
       steps: [
         {
           text: 'White side up, a corner toward you. Fold the top corner down to the bottom corner.',
-          folds: [HALVE_DOWN],
+          actions: [HALVE_DOWN],
         },
         {
           text: `Fold the left corner down to make a floppy ear. The crease runs from ${cm(-EAR_TOP[0])} cm left of the middle of the top edge to a spot ${cm(-EAR_EDGE[1])} cm down the left edge.`,
-          folds: [{ from: EAR_TOP, to: EAR_EDGE, mover: [-1, 0], kind: 'valley', bend: 1 }],
+          actions: [{ from: EAR_TOP, to: EAR_EDGE, mover: [-1, 0], kind: 'valley', bend: 1 }],
         },
         {
           text: 'Repeat on the right. The two ears should hang level.',
-          folds: [{ from: mirror(EAR_TOP), to: mirror(EAR_EDGE), mover: [1, 0], kind: 'valley', bend: -1 }],
+          actions: [{ from: mirror(EAR_TOP), to: mirror(EAR_EDGE), mover: [1, 0], kind: 'valley', bend: -1 }],
         },
         {
           text: 'Draw the face: two eyes, a big nose, a smile and a patch around one eye.',
-          draw: face,
+          actions: [{ kind: 'draw', strokes: face }],
         },
       ],
     },

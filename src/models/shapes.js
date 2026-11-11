@@ -1,4 +1,4 @@
-import { add, polar } from '../fold.js'
+import { add, polar } from '../geometry.js'
 
 export const SIDE_CM = 15
 export const CM = SIDE_CM / Math.SQRT2

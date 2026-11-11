@@ -1,4 +1,4 @@
-import { add, length, lerp, scale, sub, unit } from './fold.js'
+import { add, length, lerp, scale, sub, unit } from './geometry.js'
 
 const TONES = {
   petal: [240, 96, 141],
