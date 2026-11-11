@@ -1,15 +1,18 @@
-import { tulip } from './models/tulip.js'
-import { renderFrame, thumbnail } from './sketch.js'
+import { models } from './models/index.js'
+import { defs, renderFrame, thumbnail } from './sketch.js'
 import { buildTimeline } from './timeline.js'
 
 const SOUNDS = {
   fold: ['パタッ', 'ペタッ', 'スッ', 'キュッ'],
   swap: ['シュッ'],
   join: ['ポンッ'],
+  draw: ['カキカキ'],
 }
 const BOIL_MS = 150
 
-const timeline = buildTimeline(tulip)
+const chosen = new URLSearchParams(location.search).get('model')
+const model = models.find(candidate => candidate.id === chosen) ?? models[0]
+const timeline = buildTimeline(model)
 const total = timeline.steps.length
 const stage = document.querySelector('#stage')
 const layer = document.querySelector('#frame')
@@ -20,6 +23,11 @@ const caption = document.querySelector('#caption')
 const previousButton = document.querySelector('#previous')
 const nextButton = document.querySelector('#next')
 const calm = matchMedia('(prefers-reduced-motion: reduce)')
+
+document.body.insertAdjacentHTML('afterbegin', defs)
+document.title = `${model.name} ${model.kana}`
+document.querySelector('#model').innerHTML = `<span lang="ja">${model.kana}</span> ${model.name}`
+stage.setAttribute('aria-label', `Animated folding of the ${model.name.toLowerCase()}`)
 
 let position = 0
 let landing = null
@@ -62,7 +70,7 @@ const paint = frame => {
 const describe = current => {
   const done = current > total
   count.textContent = done ? 'できた！' : `Step ${current} / ${total}`
-  caption.textContent = done ? `Your ${tulip.name.toLowerCase()} is done.` : timeline.steps[current - 1].text
+  caption.textContent = done ? `Your ${model.name.toLowerCase()} is done.` : timeline.steps[current - 1].text
   previousButton.disabled = position === 0 && landing === null
   nextButton.disabled = position === total && landing === null
   for (const button of panel.querySelectorAll('.step')) {

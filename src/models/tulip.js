@@ -22,6 +22,7 @@ const LEAF_ANGLE = -20
 const SEAT_DEPTH = 0.2
 
 export const tulip = {
+  id: 'tulip',
   name: 'Tulip',
   kana: 'チューリップ',
   sheet: DIAMOND,

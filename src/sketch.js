@@ -3,6 +3,7 @@ import { add, length, lerp, scale, sub, unit } from './fold.js'
 const TONES = {
   petal: [240, 96, 141],
   leaf: [79, 174, 118],
+  fur: [244, 164, 84],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]
@@ -36,7 +37,32 @@ const stroke = (a, b, seed, wobble) => {
 const outline = (poly, seed, wobble) =>
   poly.map((a, i) => stroke(a, poly[(i + 1) % poly.length], seed + i * 7.3, wobble)).join('')
 
+const partial = (stroke, share) => {
+  const spans = stroke.slice(1).map((p, i) => length(sub(p, stroke[i])))
+  let left = spans.reduce((sum, span) => sum + span, 0) * share
+  const out = [stroke[0]]
+  for (let i = 0; i < spans.length && left > 0; i++) {
+    out.push(lerp(stroke[i], stroke[i + 1], Math.min(1, left / spans[i])))
+    left -= spans[i]
+  }
+  return out
+}
+
+const trace = (stroke, seed, wobble) =>
+  stroke
+    .map((p, i) => `${i ? 'L' : 'M'}${point(add(p, [wobble * noise(seed + i), wobble * noise(seed + i + 50)]))}`)
+    .join('')
+
 const draw = {
+  doodle: (item, seed, wobble) => {
+    const paths = item.strokes
+      .map((stroke, i) => {
+        const share = Math.max(0, Math.min(1, item.progress * item.strokes.length - i))
+        return share ? trace(partial(stroke, share), seed + i * 3.1, wobble * 0.45) : ''
+      })
+      .join('')
+    return `<path class="${item.guide ? 'guide pencil' : 'pen'}" opacity="${item.opacity ?? 1}" d="${paths}"/>`
+  },
   face: (item, seed, wobble) =>
     `<g opacity="${item.opacity ?? 1}">` +
     `<polygon points="${points(item.poly)}" fill="${colour(item)}"/>` +
@@ -75,9 +101,18 @@ export const renderFrame = (frame, seed = 0) => {
 }
 
 export const thumbnail = (items, view) => {
-  const { viewBox } = renderFrame({ view, items: [] })
-  const shapes = items
-    .map(item => `<polygon points="${points(item.poly)}" fill="${colour(item)}"/>`)
-    .join('')
-  return `<svg class="thumb" viewBox="${viewBox}" aria-hidden="true">${shapes}</svg>`
+  const { viewBox, markup } = renderFrame({ view, items })
+  return `<svg class="thumb" viewBox="${viewBox}" aria-hidden="true">${markup}</svg>`
 }
+
+export const defs = `
+  <svg class="defs" width="0" height="0" aria-hidden="true">
+    <defs>
+      <pattern id="hatch" patternUnits="userSpaceOnUse" width="0.05" height="0.05" patternTransform="rotate(38)">
+        <line class="hatch" x1="0" y1="0.025" x2="0.05" y2="0.025" />
+      </pattern>
+      <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="0.022" />
+      </filter>
+    </defs>
+  </svg>`
