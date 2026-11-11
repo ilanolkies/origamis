@@ -25,6 +25,7 @@ const TONES = {
   snow: [206, 222, 238],
   scarf: [214, 64, 72],
   whale: [70, 130, 180],
+  sun: [250, 196, 40],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]
@@ -88,6 +89,9 @@ const draw = {
     `<g opacity="${item.opacity ?? 1}">` +
     `<polygon points="${points(item.poly)}" fill="${colour(item)}"/>` +
     (item.colorUp ? `<polygon points="${points(item.poly)}" fill="url(#hatch)"/>` : '') +
+    (item.lines ?? [])
+      .map((line, i) => `<path class="crease kept ${line.kind}" d="${stroke(line.from, line.to, seed + 200 + i, wobble * 0.3)}"/>`)
+      .join('') +
     `<path class="ink" d="${outline(item.poly, seed, wobble)}${outline(item.poly, seed + 100, wobble)}"/>` +
     '</g>',
   shadow: item =>

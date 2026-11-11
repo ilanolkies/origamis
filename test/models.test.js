@@ -12,8 +12,7 @@ test('every category has a place on the board and every model a catalog entry', 
   for (const model of models) assert.ok(catalog[model.id], `missing catalog entry for ${model.id}`)
 })
 
-const creases = new Set(['valley', 'mountain'])
-const moves = new Set(['turn', 'rotate'])
+const creases = new Set(['valley', 'mountain', 'crease'])
 
 const placementsOf = model =>
   model.assembly
@@ -40,17 +39,12 @@ for (const model of models) {
   for (const part of model.parts) {
     test(`${model.id} ${part.id} folds flat without tearing or piercing`, () => {
       const sheetArea = Math.abs(area(model.sheet))
-      let faces = sheet(model.sheet)
+      let paper = { faces: sheet(model.sheet), doodles: [], folds: [], creases: [], tone: part.tone }
       for (const step of part.steps) {
-        for (const action of step.actions.filter(action => creases.has(action.kind) || moves.has(action.kind))) {
-          if (creases.has(action.kind)) {
-            const result = fold(faces, action)
-            assert.ok(result.moving.length > 0)
-            faces = result.faces
-          } else {
-            faces = actions[action.kind].perform({ faces, doodles: [], tone: part.tone }, action).paper.faces
-          }
-          const report = check(faces, sheetArea)
+        for (const action of step.actions.filter(action => action.kind !== 'draw')) {
+          if (creases.has(action.kind)) assert.ok(fold(paper.faces, action).moving.length > 0)
+          paper = actions[action.kind].perform(paper, action).paper
+          const report = check(paper.faces, sheetArea)
           assert.ok(report.areaError < 1e-9)
           assert.equal(report.tears, 0)
           assert.equal(report.pierced, 0)

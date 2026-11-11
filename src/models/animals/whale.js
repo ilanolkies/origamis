@@ -22,14 +22,18 @@ export const whale = {
       paper: `${SIDE_CM} cm square, blue on one side`,
       steps: [
         {
-          text: 'White side up, a corner toward you. Fold the two edges at the right corner in to the middle line.',
+          text: 'White side up, a corner toward you. Fold the bottom corner up to the top corner and unfold, leaving a crease across the middle.',
+          actions: [{ ...HALVE_UP, kind: 'crease' }],
+        },
+        {
+          text: 'Fold the two edges at the right corner in to the middle crease.',
           actions: [
             { from: TIP, to: add(TIP, polar(157.5)), mover: [0.5, 0.5], kind: 'valley', bend: -1 },
             { from: TIP, to: add(TIP, polar(202.5)), mover: [0.5, -0.5], kind: 'valley', bend: 1 },
           ],
         },
         {
-          text: 'Fold in half, bottom up.',
+          text: 'Fold in half again along the middle crease, bottom up.',
           actions: [HALVE_UP],
         },
         {

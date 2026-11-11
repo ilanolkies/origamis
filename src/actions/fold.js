@@ -5,7 +5,9 @@ import {
   compose,
   creaseSegment,
   cross,
+  det,
   dot,
+  invert,
   length,
   lerp,
   reflection,
@@ -13,7 +15,7 @@ import {
   sub,
   unit,
 } from '../geometry.js'
-import { ease, fitView, mixView, scene } from '../scene.js'
+import { ease, fitView, linesOf, mixView, moveLines, opposite, scene } from '../scene.js'
 
 const CAMERA_HEIGHT = 5
 const LIGHT = [0.22, -0.28]
@@ -40,7 +42,7 @@ export const fold = (faces, { from, to, mover, kind }) => {
   return { faces: kind === 'valley' ? [...stays, ...landed] : [...landed, ...stays], stays, moving }
 }
 
-const swingPhase = (before, crease, { tone, back }) => {
+const swingPhase = (before, crease, paper) => {
   const result = fold(before, crease)
   const axis = unit(sub(crease.to, crease.from))
   const viewFrom = fitView(before)
@@ -48,7 +50,7 @@ const swingPhase = (before, crease, { tone, back }) => {
   const eye = lerp(viewFrom.center, viewTo.center, 0.5)
   const lift = crease.kind === 'valley' ? 1 : -1
   const [lineFrom, lineTo] = creaseSegment(before, crease.from, crease.to)
-  const stays = scene(result.stays, { tone, back })
+  const stays = scene(result.stays, paper)
 
   const swing = (p, angle) => {
     const foot = add(crease.from, scale(axis, dot(sub(p, crease.from), axis)))
@@ -71,9 +73,10 @@ const swingPhase = (before, crease, { tone, back }) => {
       const movers = swung.map(({ face, points }) => ({
         type: 'face',
         poly: points.map(project),
+        lines: moveLines(linesOf(face, paper.creases), p => project(swing(p, angle))),
         colorUp: flipped ? !face.colorUp : face.colorUp,
-        tone,
-        back,
+        tone: paper.tone,
+        back: paper.back,
         shade: 1 - tilt * (flipped ? 0.3 : 0.12),
       }))
       if (flipped) movers.reverse()
@@ -91,26 +94,77 @@ const swingPhase = (before, crease, { tone, back }) => {
   }
 }
 
-const crease = {
-  level: 0,
-  perform: (paper, action) => {
-    const phase = swingPhase(paper.faces, action, paper)
-    return { paper: { ...paper, faces: phase.after }, phase }
-  },
-  marks: (paper, action) => {
-    const [from, to] = creaseSegment(paper.faces, action.from, action.to)
-    const target = apply(reflection(action.from, action.to), action.mover)
-    const reach = length(sub(target, action.mover))
-    const control = add(
-      lerp(action.mover, target, 0.5),
-      scale(unit(sub(action.to, action.from)), action.bend * 0.45 * reach),
-    )
-    return [
-      { type: 'crease', from, to, kind: action.kind },
-      { type: 'arrow', from: action.mover, control, to: target },
-    ]
-  },
+const foldMarks = (paper, action) => {
+  const [from, to] = creaseSegment(paper.faces, action.from, action.to)
+  const target = apply(reflection(action.from, action.to), action.mover)
+  const reach = length(sub(target, action.mover))
+  const control = add(
+    lerp(action.mover, target, 0.5),
+    scale(unit(sub(action.to, action.from)), action.bend * 0.45 * reach),
+  )
+  return [
+    { type: 'crease', from, to, kind: action.kind },
+    { type: 'arrow', from: action.mover, control, to: target },
+  ]
 }
 
-export const valley = crease
-export const mountain = crease
+const performFold = (paper, action) => {
+  const phase = swingPhase(paper.faces, action, paper)
+  const folds = [...(paper.folds ?? []), { before: paper.faces, crease: action }]
+  return { paper: { ...paper, faces: phase.after, folds }, phase }
+}
+
+const scored = (faces, crease) =>
+  faces
+    .filter(face => clip(face.poly, crease.from, crease.to, 1) && clip(face.poly, crease.from, crease.to, -1))
+    .map(face => {
+      const back = invert(face.matrix)
+      const [from, to] = creaseSegment([face], crease.from, crease.to).map(p => apply(back, p))
+      return { from, to, kind: det(face.matrix) > 0 ? crease.kind : opposite(crease.kind) }
+    })
+
+const lastFold = paper => paper.folds.at(-1)
+
+const performUnfold = paper => {
+  const { before, crease } = lastFold(paper)
+  const creases = [...(paper.creases ?? []), ...scored(before, crease)]
+  const opened = { ...paper, faces: before, folds: paper.folds.slice(0, -1), creases }
+  const { sounds, duration, frame } = swingPhase(before, crease, opened)
+  return { paper: opened, phase: { kind: 'unfold', sounds, duration, frame: t => frame(1 - t) } }
+}
+
+const unfoldMarks = paper => {
+  if (!paper.folds?.length) return []
+  const { crease } = lastFold(paper)
+  return foldMarks(paper, { ...crease, mover: apply(reflection(crease.from, crease.to), crease.mover) })
+}
+
+export const moveFolds = (folds = [], m, moveFaces) =>
+  folds.map(({ before, crease }) => ({
+    before: moveFaces(before),
+    crease: {
+      ...crease,
+      from: apply(m, crease.from),
+      to: apply(m, crease.to),
+      mover: apply(m, crease.mover),
+      kind: det(m) > 0 ? crease.kind : opposite(crease.kind),
+      bend: det(m) > 0 ? crease.bend : -crease.bend,
+    },
+  }))
+
+const folding = { level: 0, perform: performFold, marks: foldMarks }
+
+export const valley = folding
+export const mountain = folding
+
+export const unfold = { level: 3, perform: performUnfold, marks: unfoldMarks }
+
+export const crease = {
+  level: 3,
+  perform: (paper, action) => {
+    const folded = performFold(paper, { ...action, kind: action.fold ?? 'valley' })
+    const opened = performUnfold(folded.paper)
+    return { paper: opened.paper, phase: [folded.phase, opened.phase] }
+  },
+  marks: (paper, action) => foldMarks(paper, { ...action, kind: action.fold ?? 'valley' }),
+}

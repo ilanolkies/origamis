@@ -1,5 +1,6 @@
 import { add, apply, bounds, compose, dot, reflection, scale, sub, unit } from '../geometry.js'
-import { ease, fitView, look, mixView, scene } from '../scene.js'
+import { ease, fitView, linesOf, look, mixView, moveLines, scene } from '../scene.js'
+import { moveFolds } from './fold.js'
 
 const CAMERA_HEIGHT = 5
 const SOUNDS = ['クルッ', 'ペラッ']
@@ -52,6 +53,7 @@ const flipPhase = (paper, [from, to], after) => {
       const items = faces.map(face => ({
         type: 'face',
         poly: face.poly.map(p => project(p, angle)),
+        lines: moveLines(linesOf(face, paper.creases), p => project(p, angle)),
         colorUp: flipped ? !face.colorUp : face.colorUp,
         tone: paper.tone,
         back: paper.back,
@@ -73,7 +75,8 @@ export const turn = {
   perform: (paper, action) => {
     const axis = axisOf(paper.faces, action)
     const faces = turnOver(paper.faces, axis)
-    return { paper: { ...paper, faces, doodles: [] }, phase: flipPhase(paper, axis, faces) }
+    const folds = moveFolds(paper.folds, reflection(...axis), before => turnOver(before, axis))
+    return { paper: { ...paper, faces, folds, doodles: [] }, phase: flipPhase(paper, axis, faces) }
   },
   marks: (paper, action) => {
     const [from, to] = axisOf(paper.faces, action)

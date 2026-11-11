@@ -1,11 +1,11 @@
 import { dot, length, sub } from '../geometry.js'
 import { draw } from './draw.js'
-import { mountain, valley } from './fold.js'
+import { crease, mountain, unfold, valley } from './fold.js'
 import { join } from './join.js'
 import { rotate } from './rotate.js'
 import { turn } from './turn.js'
 
-export const actions = { valley, mountain, draw, join, turn, rotate }
+export const actions = { valley, mountain, unfold, crease, draw, join, turn, rotate }
 
 export const LEVELS = 9
 

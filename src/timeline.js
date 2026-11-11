@@ -29,7 +29,7 @@ export const buildTimeline = model => {
 
   for (const part of model.parts) {
     const section = { name: part.name, kanji: part.kanji, paper: part.paper, steps: [] }
-    let paper = { faces: sheet(model.sheet), doodles: [], tone: part.tone, back: part.back }
+    let paper = { faces: sheet(model.sheet), doodles: [], folds: [], creases: [], tone: part.tone, back: part.back }
     part.steps.forEach((step, index) => {
       const start = look(paper)
       const swap = index === 0 && shown
@@ -37,7 +37,7 @@ export const buildTimeline = model => {
       const marks = step.actions.flatMap(action => actions[action.kind].marks(paper, action))
       for (const action of step.actions) {
         const done = actions[action.kind].perform(paper, action)
-        phases.push(done.phase)
+        phases.push(...[done.phase].flat())
         paper = done.paper
       }
       const entry = {
