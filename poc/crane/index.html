@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" class="docked">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crane in 3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Patrick+Hand&family=Yusei+Magic&display=swap"
+    />
+    <link rel="stylesheet" href="../../style.css" />
+    <link rel="stylesheet" href="crane.css" />
+  </head>
+  <body class="crane3d">
+    <header class="masthead">
+      <h1><span lang="ja">折り鶴</span> Crane</h1>
+      <p class="model">3D proof of concept</p>
+    </header>
+    <main class="room">
+      <svg viewBox="-1.25 -1 2.5 2" role="img" aria-label="A paper crane being folded in 3D">
+        <defs>
+          <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="0.012" />
+          </filter>
+        </defs>
+        <g id="scene"></g>
+      </svg>
+    </main>
+    <footer class="controls">
+      <button id="previous" type="button" class="turn" aria-label="Previous step">◀</button>
+      <div class="bubble" aria-live="polite">
+        <span id="count"></span>
+        <p id="caption"></p>
+      </div>
+      <button id="next" type="button" class="turn" aria-label="Next step">▶</button>
+      <button id="play" type="button" class="turn" aria-label="Play or pause">❚❚</button>
+    </footer>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+.crane3d {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.crane3d .room {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.crane3d .room svg {
+  flex: 1;
+  min-width: 0;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.crane3d #scene {
+  pointer-events: bounding-box;
+}
+
+.crane3d .table {
+  fill: var(--sheet);
+  stroke: var(--ink);
+  stroke-width: 0.006;
+  stroke-linejoin: round;
+}
+
+.crane3d .rule {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 0.004;
+}
+
+.crane3d .cast {
+  fill: var(--ink);
+  opacity: 0.16;
+  filter: url(#blur);
+}
+
+.crane3d .ink {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.crane3d .controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px 18px;
+}
+
+.crane3d .bubble {
+  flex: 0 1 560px;
+}
