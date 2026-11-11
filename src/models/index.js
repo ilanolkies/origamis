@@ -1,8 +1,17 @@
-import { cat, catFace } from './cat.js'
-import { dog } from './dog.js'
-import { fox } from './fox.js'
-import { pig } from './pig.js'
-import { rabbit } from './rabbit.js'
-import { tulip } from './tulip.js'
+import { catFace } from './animal-faces/cat.js'
+import { dog } from './animal-faces/dog.js'
+import { fox } from './animal-faces/fox.js'
+import { pig } from './animal-faces/pig.js'
+import { rabbit } from './animal-faces/rabbit.js'
+import { cat } from './animals/cat.js'
+import { tulip } from './flowers/tulip.js'
 
-export const models = [tulip, cat, catFace, dog, fox, rabbit, pig]
+export const categories = {
+  Flowers: [tulip],
+  Animals: [cat],
+  'Animal faces': [catFace, dog, fox, rabbit, pig],
+}
+
+export const models = Object.values(categories).flat()
+
+export const categoryOf = model => Object.keys(categories).find(name => categories[name].includes(model))

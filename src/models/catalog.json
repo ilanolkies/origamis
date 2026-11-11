@@ -1,6 +1,5 @@
 {
   "tulip": {
-    "category": "Flowers",
     "minutes": 5,
     "tools": ["scissors"],
     "place": {
@@ -10,7 +9,6 @@
     }
   },
   "cat": {
-    "category": "Animals",
     "minutes": 8,
     "tools": ["pen"],
     "place": {
@@ -20,7 +18,6 @@
     }
   },
   "cat-face": {
-    "category": "Animal faces",
     "minutes": 3,
     "tools": ["pen"],
     "place": {
@@ -30,7 +27,6 @@
     }
   },
   "dog-face": {
-    "category": "Animal faces",
     "minutes": 3,
     "tools": ["pen"],
     "place": {
@@ -40,7 +36,6 @@
     }
   },
   "fox-face": {
-    "category": "Animal faces",
     "minutes": 3,
     "tools": ["pen"],
     "place": {
@@ -50,7 +45,6 @@
     }
   },
   "rabbit-face": {
-    "category": "Animal faces",
     "minutes": 3,
     "tools": ["pen"],
     "place": {
@@ -60,7 +54,6 @@
     }
   },
   "pig-face": {
-    "category": "Animal faces",
     "minutes": 3,
     "tools": ["pen"],
     "place": {

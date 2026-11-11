@@ -1,4 +1,4 @@
-import { arc, cm, DIAMOND, HALVE_DOWN, mirror, SIDE_CM } from './shapes.js'
+import { arc, cm, DIAMOND, HALVE_DOWN, mirror, SIDE_CM } from '../shapes.js'
 
 const EAR_TOP = [-0.6, 0]
 const EAR_EDGE = [-0.82, -0.18]

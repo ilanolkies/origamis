@@ -1,5 +1,5 @@
-import { length, polar, sub } from '../geometry.js'
-import { CENTRE, cm, DIAMOND, edgeReach, HALVE_UP, mirror, SIDE_CM } from './shapes.js'
+import { length, polar, sub } from '../../geometry.js'
+import { CENTRE, cm, DIAMOND, edgeReach, HALVE_UP, mirror, SIDE_CM } from '../shapes.js'
 
 const BROW = 0.5
 const EAR_ANGLE = 28

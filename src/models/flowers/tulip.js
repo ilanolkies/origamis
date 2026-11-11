@@ -1,4 +1,4 @@
-import { add, length, polar, scale, sub, unit } from '../geometry.js'
+import { add, length, polar, scale, sub, unit } from '../../geometry.js'
 
 const SIDE_CM = 15
 const CM = SIDE_CM / Math.SQRT2
