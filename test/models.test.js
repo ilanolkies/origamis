@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { actions, difficultyOf, kindsOf, LEVELS } from '../src/actions/index.js'
+import { actions, difficultyOf, kindsOf, LEVELS, piecesOf } from '../src/actions/index.js'
 import { fold } from '../src/actions/fold.js'
 import { area, check, sheet } from '../src/geometry.js'
 import catalog from '../src/models/catalog.json' with { type: 'json' }
@@ -15,7 +15,23 @@ test('every category has a place on the board and every model a catalog entry', 
 const creases = new Set(['valley', 'mountain'])
 const moves = new Set(['turn', 'rotate'])
 
+const placementsOf = model =>
+  model.assembly
+    ? [
+        model.assembly.base,
+        ...model.assembly.steps.flatMap(step => step.actions.filter(action => action.kind === 'join')),
+      ]
+    : model.parts.map(part => ({ part: part.id }))
+
 for (const model of models) {
+  test(`${model.id} places every piece it folds`, () => {
+    const uses = placementsOf(model).map(placement => placement.part)
+    for (const part of model.parts) {
+      assert.equal(uses.filter(id => id === part.id).length, part.copies ?? 1, part.id)
+    }
+    assert.equal(uses.length, piecesOf(model))
+  })
+
   test(`${model.id} only uses registered actions`, () => {
     for (const kind of kindsOf(model)) assert.ok(actions[kind], `unknown action ${kind}`)
     assert.ok(difficultyOf(model) >= 1 && difficultyOf(model) <= LEVELS)

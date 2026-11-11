@@ -66,12 +66,15 @@ export const carrot = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'leaves',
-    top: 'root',
-    seat: [0, OVERLAP - SHOULDER],
-    text: `Lay the carrot over the bottom of the leaves so about ${Math.round(OVERLAP * CM)} cm of them hides behind it. A dab of glue keeps it in place.`,
+    base: { part: 'leaves' },
+    steps: [
+      {
+        text: `Lay the carrot over the bottom of the leaves so about ${Math.round(OVERLAP * CM)} cm of them hides behind it. A dab of glue keeps it in place.`,
+        actions: [{ kind: 'join', part: 'root', seat: [0, OVERLAP - SHOULDER] }],
+      },
+    ],
   },
 }

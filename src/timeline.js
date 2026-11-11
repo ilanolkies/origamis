@@ -1,6 +1,6 @@
-import { actions } from './actions/index.js'
+import { actions, piecesOf } from './actions/index.js'
 import { sheet } from './geometry.js'
-import { ease, fitView, look, mixView, shifted } from './scene.js'
+import { ease, fitView, look, mixView, placed, shifted } from './scene.js'
 
 const SLIDE = 2.6
 
@@ -57,20 +57,31 @@ export const buildTimeline = model => {
     sections.push(section)
   }
 
-  const { finish } = model
-  if (finish) {
-    const base = finals[finish.base]
-    const { joined, phase } = actions.join.perform(base, finals[finish.top], finish)
-    const last = {
-      number: steps.length + 1,
-      text: finish.text,
-      phases: [phase],
-      start: base,
-      marks: [],
-      after: joined,
+  const { assembly } = model
+  if (assembly) {
+    const pieces = piecesOf(model)
+    const section = {
+      name: assembly.name,
+      kanji: assembly.kanji,
+      paper: pieces === 2 ? 'Both pieces' : `All ${pieces} pieces`,
+      steps: [],
     }
-    steps.push(last)
-    sections.push({ name: finish.name, kanji: finish.kanji, paper: 'Both pieces', steps: [last], preview: joined })
+    let items = placed(finals[assembly.base.part], assembly.base)
+    for (const step of assembly.steps) {
+      const start = items
+      const marks = step.actions.flatMap(action => actions[action.kind].marks(start, action))
+      const phases = []
+      for (const action of step.actions) {
+        const done = actions[action.kind].assemble(items, action, finals)
+        phases.push(done.phase)
+        items = done.items
+      }
+      const entry = { number: steps.length + 1, text: step.text, phases, start, marks, after: items }
+      steps.push(entry)
+      section.steps.push(entry)
+    }
+    section.preview = items
+    sections.push(section)
   }
 
   const idle = position => {

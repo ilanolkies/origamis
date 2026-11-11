@@ -39,12 +39,15 @@ export const cat = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'body',
-    top: 'head',
-    seat: [0, 1 - NECK_DEPTH],
-    text: `Slide the body's top point about ${Math.round(NECK_DEPTH * CM)} cm up behind the face, in front of the folded-down flap. A dab of glue keeps it in place.`,
+    base: { part: 'body' },
+    steps: [
+      {
+        text: `Slide the body's top point about ${Math.round(NECK_DEPTH * CM)} cm up behind the face, in front of the folded-down flap. A dab of glue keeps it in place.`,
+        actions: [{ kind: 'join', part: 'head', seat: [0, 1 - NECK_DEPTH] }],
+      },
+    ],
   },
 }

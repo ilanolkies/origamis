@@ -2,20 +2,24 @@ import { fitView, look } from '../scene.js'
 
 const SOUNDS = ['カキカキ']
 
+const doodle = (strokes, progress) => ({ type: 'doodle', strokes, progress })
+
+const drawing = (items, strokes) => {
+  const view = fitView(items)
+  return {
+    kind: 'draw',
+    sounds: SOUNDS,
+    duration: 2000,
+    frame: t => ({ view, items: [...items, doodle(strokes, t)] }),
+  }
+}
+
 export const draw = {
   level: 0,
-  perform: (paper, { strokes }) => {
-    const items = look(paper)
-    const view = fitView(items)
-    return {
-      paper: { ...paper, doodles: [...paper.doodles, { type: 'doodle', strokes, progress: 1 }] },
-      phase: {
-        kind: 'draw',
-        sounds: SOUNDS,
-        duration: 2000,
-        frame: t => ({ view, items: [...items, { type: 'doodle', strokes, progress: t }] }),
-      },
-    }
-  },
-  marks: (paper, { strokes }) => [{ type: 'doodle', strokes, progress: 1, guide: true }],
+  perform: (paper, { strokes }) => ({
+    paper: { ...paper, doodles: [...paper.doodles, doodle(strokes, 1)] },
+    phase: drawing(look(paper), strokes),
+  }),
+  assemble: (items, { strokes }) => ({ items: [...items, doodle(strokes, 1)], phase: drawing(items, strokes) }),
+  marks: (paper, { strokes }) => [{ ...doodle(strokes, 1), guide: true }],
 }

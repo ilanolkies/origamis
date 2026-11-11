@@ -39,12 +39,15 @@ export const dog = {
       ],
     },
   ],
-  finish: {
+  assembly: {
     name: 'Finish',
     kanji: '完成',
-    base: 'body',
-    top: 'face',
-    seat: [0, 2 - NECK_DEPTH],
-    text: `Slide the body's top point about ${Math.round(NECK_DEPTH * CM)} cm up behind the face. A dab of glue keeps it in place.`,
+    base: { part: 'body' },
+    steps: [
+      {
+        text: `Slide the body's top point about ${Math.round(NECK_DEPTH * CM)} cm up behind the face. A dab of glue keeps it in place.`,
+        actions: [{ kind: 'join', part: 'face', seat: [0, 2 - NECK_DEPTH] }],
+      },
+    ],
   },
 }
