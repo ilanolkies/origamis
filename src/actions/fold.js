@@ -29,7 +29,7 @@ const LAYERED = 4
 const TUCKED = 5
 const PROBE = 1e-3
 
-const lifted = (faces, { from, to, mover, layers }, sign, mirror) => {
+export const lifted = (faces, { from, to, mover, layers }, sign, mirror) => {
   const all = faces.map((_, i) => i)
   if (layers === undefined) return new Set(all)
   const parts = faces.map(face => clip(face.poly, from, to, sign))
@@ -89,6 +89,7 @@ export const fold = (faces, crease) => {
   })
   const landed = moving
     .map(face => ({
+      ...face,
       poly: face.poly.map(p => apply(mirror, p)),
       matrix: compose(mirror, face.matrix),
       colorUp: !face.colorUp,
