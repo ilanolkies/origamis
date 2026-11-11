@@ -12,7 +12,7 @@
     "minutes": 8,
     "tools": ["pen"],
     "place": {
-      "x": 481,
+      "x": 1300,
       "y": 68,
       "tilt": -4
     }
@@ -22,7 +22,7 @@
     "tools": ["pen"],
     "place": {
       "x": 740,
-      "y": 760,
+      "y": 910,
       "tilt": -4
     }
   },
@@ -31,7 +31,7 @@
     "tools": ["pen"],
     "place": {
       "x": 172,
-      "y": 547,
+      "y": 697,
       "tilt": 3
     }
   },
@@ -40,7 +40,7 @@
     "tools": ["pen"],
     "place": {
       "x": 72,
-      "y": 798,
+      "y": 948,
       "tilt": -4
     }
   },
@@ -49,7 +49,7 @@
     "tools": ["pen"],
     "place": {
       "x": 380,
-      "y": 690,
+      "y": 840,
       "tilt": 3
     }
   },
@@ -58,8 +58,98 @@
     "tools": ["pen"],
     "place": {
       "x": 600,
-      "y": 538,
+      "y": 688,
       "tilt": -4
+    }
+  },
+  "watermelon": {
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 1450,
+      "y": 700,
+      "tilt": -3
+    }
+  },
+  "onigiri": {
+    "minutes": 4,
+    "tools": ["glue"],
+    "place": {
+      "x": 1780,
+      "y": 690,
+      "tilt": 4
+    }
+  },
+  "carrot": {
+    "minutes": 4,
+    "tools": ["pen", "glue"],
+    "place": {
+      "x": 2110,
+      "y": 700,
+      "tilt": -2
+    }
+  },
+  "sailboat": {
+    "minutes": 3,
+    "tools": ["glue"],
+    "place": {
+      "x": 44,
+      "y": 1450,
+      "tilt": 3
+    }
+  },
+  "rocket": {
+    "minutes": 5,
+    "tools": ["pen", "glue"],
+    "place": {
+      "x": 374,
+      "y": 1440,
+      "tilt": -3
+    }
+  },
+  "fuji": {
+    "minutes": 2,
+    "tools": ["none"],
+    "place": {
+      "x": 1000,
+      "y": 1460,
+      "tilt": -2
+    }
+  },
+  "leaf": {
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 374,
+      "y": 78,
+      "tilt": 3
+    }
+  },
+  "stem": {
+    "minutes": 3,
+    "tools": ["none"],
+    "place": {
+      "x": 704,
+      "y": 78,
+      "tilt": -2
+    }
+  },
+  "dog": {
+    "minutes": 8,
+    "tools": ["pen"],
+    "place": {
+      "x": 1630,
+      "y": 70,
+      "tilt": 3
+    }
+  },
+  "whale": {
+    "minutes": 5,
+    "tools": ["pen"],
+    "place": {
+      "x": 1960,
+      "y": 90,
+      "tilt": -3
     }
   }
 }
