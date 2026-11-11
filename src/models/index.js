@@ -16,6 +16,7 @@ import { onigiri } from './food/onigiri.js'
 import { watermelon } from './food/watermelon.js'
 import { christmasTree } from './seasonal/christmas-tree.js'
 import { fuji } from './seasonal/fuji.js'
+import { snowman } from './seasonal/snowman.js'
 import { rocket } from './vehicles/rocket.js'
 import { sailboat } from './vehicles/sailboat.js'
 
@@ -25,7 +26,7 @@ export const categories = {
   'Animal faces': [catFace, dogFace, fox, rabbit, pig],
   Food: [watermelon, onigiri, carrot, iceCream, nigiri],
   Vehicles: [sailboat, rocket],
-  Seasonal: [fuji, christmasTree],
+  Seasonal: [fuji, christmasTree, snowman],
 }
 
 export const models = Object.values(categories).flat()

@@ -178,5 +178,14 @@
       "y": 1450,
       "tilt": 3
     }
+  },
+  "snowman": {
+    "minutes": 8,
+    "tools": ["pen", "glue"],
+    "place": {
+      "x": 1660,
+      "y": 1465,
+      "tilt": -3
+    }
   }
 }
