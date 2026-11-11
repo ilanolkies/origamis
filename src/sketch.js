@@ -26,6 +26,7 @@ const TONES = {
   scarf: [214, 64, 72],
   whale: [70, 130, 180],
   sun: [250, 196, 40],
+  cicada: [112, 150, 72],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]

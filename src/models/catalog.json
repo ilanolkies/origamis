@@ -205,5 +205,14 @@
       "y": 76,
       "tilt": -3
     }
+  },
+  "cicada": {
+    "minutes": 5,
+    "tools": ["pen"],
+    "place": {
+      "x": 2585,
+      "y": 1455,
+      "tilt": 3
+    }
   }
 }
