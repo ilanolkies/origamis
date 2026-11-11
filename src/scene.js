@@ -3,8 +3,8 @@ import { add, bounds, lerp } from './geometry.js'
 export const ease = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
 export const settle = t => 1 + 2.70158 * (t - 1) ** 3 + 1.70158 * (t - 1) ** 2
 
-export const scene = (faces, { tone }) =>
-  faces.map(face => ({ type: 'face', poly: face.poly, colorUp: face.colorUp, tone, shade: 1 }))
+export const scene = (faces, { tone, back }) =>
+  faces.map(face => ({ type: 'face', poly: face.poly, colorUp: face.colorUp, tone, back, shade: 1 }))
 
 export const shifted = (items, offset, opacity = 1) =>
   items.map(item =>

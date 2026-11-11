@@ -54,6 +54,7 @@ const flipPhase = (paper, [from, to], after) => {
         poly: face.poly.map(p => project(p, angle)),
         colorUp: flipped ? !face.colorUp : face.colorUp,
         tone: paper.tone,
+        back: paper.back,
         shade: 1 - 0.25 * Math.sin(angle),
       }))
       const doodles = flipped

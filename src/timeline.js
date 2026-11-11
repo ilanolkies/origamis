@@ -29,7 +29,7 @@ export const buildTimeline = model => {
 
   for (const part of model.parts) {
     const section = { name: part.name, kanji: part.kanji, paper: part.paper, steps: [] }
-    let paper = { faces: sheet(model.sheet), doodles: [], tone: part.tone }
+    let paper = { faces: sheet(model.sheet), doodles: [], tone: part.tone, back: part.back }
     part.steps.forEach((step, index) => {
       const start = look(paper)
       const swap = index === 0 && shown
