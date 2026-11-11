@@ -28,6 +28,7 @@ const TONES = {
   sun: [250, 196, 40],
   cicada: [112, 150, 72],
   helmet: [104, 88, 164],
+  heart: [226, 72, 100],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]

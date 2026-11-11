@@ -19,6 +19,7 @@ import { watermelon } from './food/watermelon.js'
 import { cicada } from './insects/cicada.js'
 import { christmasTree } from './seasonal/christmas-tree.js'
 import { fuji } from './seasonal/fuji.js'
+import { heart } from './seasonal/heart.js'
 import { snowman } from './seasonal/snowman.js'
 import { helmet } from './things/helmet.js'
 import { rocket } from './vehicles/rocket.js'
@@ -30,7 +31,7 @@ export const categories = {
   'Animal faces': [catFace, dogFace, fox, rabbit, pig],
   Food: [watermelon, onigiri, carrot, iceCream, nigiri],
   Vehicles: [sailboat, rocket],
-  Seasonal: [fuji, christmasTree, snowman],
+  Seasonal: [fuji, christmasTree, snowman, heart],
   Insects: [cicada],
   Things: [helmet],
 }
