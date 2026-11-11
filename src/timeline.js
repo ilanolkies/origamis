@@ -190,19 +190,21 @@ export const buildTimeline = model => {
   }
 
   const { finish } = model
-  const base = finals[finish.base]
-  const top = finals[finish.top]
-  const joined = [...base, ...shifted(top, finish.seat)]
-  const last = {
-    number: steps.length + 1,
-    text: finish.text,
-    phases: [joinPhase(base, top, finish.seat)],
-    start: base,
-    marks: [],
-    after: joined,
+  if (finish) {
+    const base = finals[finish.base]
+    const top = finals[finish.top]
+    const joined = [...base, ...shifted(top, finish.seat)]
+    const last = {
+      number: steps.length + 1,
+      text: finish.text,
+      phases: [joinPhase(base, top, finish.seat)],
+      start: base,
+      marks: [],
+      after: joined,
+    }
+    steps.push(last)
+    sections.push({ name: finish.name, kanji: finish.kanji, paper: 'Both pieces', steps: [last], preview: joined })
   }
-  steps.push(last)
-  sections.push({ name: finish.name, kanji: finish.kanji, paper: 'Both pieces', steps: [last], preview: joined })
 
   const idle = position => {
     const items = position === 0 ? steps[0].start : steps[position - 1].after
