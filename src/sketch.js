@@ -16,6 +16,7 @@ const TONES = {
   wood: [176, 118, 72],
   rocket: [226, 74, 74],
   fins: [86, 128, 196],
+  fuji: [78, 110, 178],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]

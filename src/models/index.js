@@ -8,6 +8,7 @@ import { tulip } from './flowers/tulip.js'
 import { carrot } from './food/carrot.js'
 import { onigiri } from './food/onigiri.js'
 import { watermelon } from './food/watermelon.js'
+import { fuji } from './seasonal/fuji.js'
 import { rocket } from './vehicles/rocket.js'
 import { sailboat } from './vehicles/sailboat.js'
 
@@ -17,6 +18,7 @@ export const categories = {
   'Animal faces': [catFace, dog, fox, rabbit, pig],
   Food: [watermelon, onigiri, carrot],
   Vehicles: [sailboat, rocket],
+  Seasonal: [fuji],
 }
 
 export const models = Object.values(categories).flat()
