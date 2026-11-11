@@ -20,6 +20,7 @@ import { cicada } from './insects/cicada.js'
 import { christmasTree } from './seasonal/christmas-tree.js'
 import { fuji } from './seasonal/fuji.js'
 import { snowman } from './seasonal/snowman.js'
+import { helmet } from './things/helmet.js'
 import { rocket } from './vehicles/rocket.js'
 import { sailboat } from './vehicles/sailboat.js'
 
@@ -31,6 +32,7 @@ export const categories = {
   Vehicles: [sailboat, rocket],
   Seasonal: [fuji, christmasTree, snowman],
   Insects: [cicada],
+  Things: [helmet],
 }
 
 export const models = Object.values(categories).flat()

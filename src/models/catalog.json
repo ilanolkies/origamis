@@ -214,5 +214,14 @@
       "y": 1455,
       "tilt": 3
     }
+  },
+  "helmet": {
+    "minutes": 4,
+    "tools": ["none"],
+    "place": {
+      "x": 44,
+      "y": 2090,
+      "tilt": -3
+    }
   }
 }
