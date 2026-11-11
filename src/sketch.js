@@ -31,6 +31,7 @@ const TONES = {
   heart: [226, 72, 100],
   cup: [86, 164, 214],
   roof: [204, 78, 62],
+  piano: [58, 52, 64],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]
