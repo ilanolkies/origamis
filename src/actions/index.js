@@ -13,12 +13,19 @@ const RECTANGLE_LEVEL = 1
 const ASSEMBLY_LEVEL = 2
 const PAIR = 2
 
-const stepKinds = steps => steps.flatMap(step => step.actions.map(action => action.kind))
+const stepActions = steps => steps.flatMap(step => step.actions)
 
-export const kindsOf = model => [
-  ...model.parts.flatMap(part => stepKinds(part.steps)),
-  ...stepKinds(model.assembly?.steps ?? []),
+export const actionsOf = model => [
+  ...model.parts.flatMap(part => stepActions(part.steps)),
+  ...stepActions(model.assembly?.steps ?? []),
 ]
+
+export const kindsOf = model => actionsOf(model).map(action => action.kind)
+
+const levelOf = action => {
+  const { level } = actions[action.kind]
+  return typeof level === 'function' ? level(action) : level
+}
 
 export const piecesOf = model => model.parts.reduce((count, part) => count + (part.copies ?? 1), 0)
 
@@ -38,4 +45,4 @@ const repeats = model => model.parts.some(part => (part.copies ?? 1) > 1)
 const assemblyLevel = model => (piecesOf(model) > PAIR || repeats(model) ? ASSEMBLY_LEVEL : 0)
 
 export const difficultyOf = model =>
-  1 + Math.max(sheetLevel(model), assemblyLevel(model), ...kindsOf(model).map(kind => actions[kind].level))
+  1 + Math.max(sheetLevel(model), assemblyLevel(model), ...actionsOf(model).map(levelOf))
