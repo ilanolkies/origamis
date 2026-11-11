@@ -5,6 +5,7 @@ import { pig } from './animal-faces/pig.js'
 import { rabbit } from './animal-faces/rabbit.js'
 import { cat } from './animals/cat.js'
 import { dog } from './animals/dog.js'
+import { flappingBird } from './animals/flapping-bird.js'
 import { swan } from './animals/swan.js'
 import { whale } from './animals/whale.js'
 import { cherryBlossom } from './flowers/cherry-blossom.js'
@@ -17,6 +18,7 @@ import { iceCream } from './food/ice-cream.js'
 import { nigiri } from './food/nigiri.js'
 import { onigiri } from './food/onigiri.js'
 import { watermelon } from './food/watermelon.js'
+import { butterfly } from './insects/butterfly.js'
 import { cicada } from './insects/cicada.js'
 import { christmasTree } from './seasonal/christmas-tree.js'
 import { fuji } from './seasonal/fuji.js'
@@ -31,12 +33,12 @@ import { sailboat } from './vehicles/sailboat.js'
 
 export const categories = {
   Flowers: [tulip, leaf, stem, cherryBlossom, sunflower],
-  Animals: [cat, dog, whale, swan],
+  Animals: [cat, dog, whale, swan, flappingBird],
   'Animal faces': [catFace, dogFace, fox, rabbit, pig],
   Food: [watermelon, onigiri, carrot, iceCream, nigiri],
   Vehicles: [sailboat, rocket],
   Seasonal: [fuji, christmasTree, snowman, heart],
-  Insects: [cicada],
+  Insects: [cicada, butterfly],
   Things: [helmet, cup, house, piano],
 }
 

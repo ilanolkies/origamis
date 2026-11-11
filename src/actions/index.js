@@ -1,8 +1,10 @@
 import { dot, length, sub } from '../geometry.js'
+import { collapseAction } from './collapse.js'
 import { draw } from './draw.js'
 import { crease, mountain, unfold, valley } from './fold.js'
 import { join } from './join.js'
-import { insideReverse, outsideReverse } from './reverse.js'
+import { petalAction } from './petal.js'
+import { insideReverse, outsideReverse, sink } from './reverse.js'
 import { rotate } from './rotate.js'
 import { squashAction } from './squash.js'
 import { turn } from './turn.js'
@@ -19,6 +21,9 @@ export const actions = {
   squash: squashAction,
   'inside-reverse': insideReverse,
   'outside-reverse': outsideReverse,
+  collapse: collapseAction,
+  petal: petalAction,
+  sink,
 }
 
 export const LEVELS = 9

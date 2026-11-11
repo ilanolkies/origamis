@@ -13,29 +13,35 @@ const flapOf = (faces, { from, to, mover }) => {
 
 const mirrored = ({ from, to, diagonal }) => diagonal.map(p => apply(reflection(from, to), p))
 
-const squashFold = (faces, action) => {
+const span = ([start, end], [from, to]) => [start + (end - start) * from, start + (end - start) * to]
+
+export const squashTraced = (all, action, window = [0, 1]) => {
   const { from, to, mover, diagonal } = action
-  const flap = flapOf(faces, action)
-  const { back: staying, front: opening } = halves(flap, i => Math.abs(area(faces[i].poly)))
-  const all = tracked(faces)
+  const flap = flapOf(all, action)
+  const { back: staying, front: opening } = halves(flap, i => Math.abs(area(all[i].poly)))
   const [near, far] = diagonal
   const [otherNear, otherFar] = mirrored(action)
   const lowered = foldAlong(
     staying.map(i => all[i]),
     { from: near, to: far, mover, kind: 'valley' },
-    axis(near, far, 1, [0.5, 1]),
+    axis(near, far, 1, span(window, [0.5, 1])),
   )
-  const opened = foldAlong(opening.map(i => all[i]), { from, to, mover, kind: 'valley' }, axis(from, to, 1, [0, 0.5]))
+  const opened = foldAlong(
+    opening.map(i => all[i]),
+    { from, to, mover, kind: 'valley' },
+    axis(from, to, 1, span(window, [0, 0.5])),
+  )
   const spread = foldAlong(
     opened,
     { from: otherNear, to: otherFar, mover: apply(reflection(from, to), mover), kind: 'valley' },
-    axis(otherNear, otherFar, 1, [0.5, 1]),
+    axis(otherNear, otherFar, 1, span(window, [0.5, 1])),
   )
-  const rest = all.filter(face => !flap.includes(face.rank))
-  const below = rest.filter(face => face.rank < flap[0])
-  const above = rest.filter(face => face.rank > flap[0])
+  const below = all.filter((_, i) => i < flap[0])
+  const above = all.filter((_, i) => i > flap[0] && !flap.includes(i))
   return [...below, ...lowered, ...spread, ...above]
 }
+
+const squashFold = (faces, action) => squashTraced(tracked(faces), action)
 
 export const squash = (faces, action) => plain(squashFold(faces, action))
 
