@@ -1,7 +1,7 @@
 import { difficultyOf, LEVELS } from './actions/index.js'
 import catalog from './models/catalog.json' with { type: 'json' }
 import categories from './models/categories.json' with { type: 'json' }
-import { models } from './models/index.js'
+import { categoryOf, models } from './models/index.js'
 import { defs, renderFrame } from './sketch.js'
 import { buildTimeline } from './timeline.js'
 import { createViewer } from './viewer.js'
@@ -59,7 +59,7 @@ const card = ({ model, facts, difficulty, steps }) => `
         <span class="label">
           <span class="kana" lang="ja">${model.kana}</span>
           <span class="name">${model.name}</span>
-          <span class="tag">${facts.category}</span>
+          <span class="tag">${categoryOf(model)}</span>
           <span class="facts">
             <span>${plural(model.parts.length, 'piece')}</span>
             <span>${plural(steps, 'step')}</span>
