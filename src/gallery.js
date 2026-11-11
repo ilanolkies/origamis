@@ -36,6 +36,13 @@ const paint = seed =>
     drawings[index].innerHTML = markup
   })
 
+gallery.addEventListener('pointermove', event => {
+  const label = event.target.closest('.piece')?.querySelector('.label')
+  if (!label) return
+  label.style.setProperty('--x', `${Math.min(event.clientX + 18, innerWidth - label.offsetWidth - 14)}px`)
+  label.style.setProperty('--y', `${Math.min(event.clientY + 18, innerHeight - label.offsetHeight - 14)}px`)
+})
+
 let boil = 0
 paint(boil)
 setInterval(() => {
