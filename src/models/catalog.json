@@ -151,5 +151,23 @@
       "y": 90,
       "tilt": -3
     }
+  },
+  "ice-cream": {
+    "minutes": 5,
+    "tools": ["pen", "glue"],
+    "place": {
+      "x": 2440,
+      "y": 690,
+      "tilt": 3
+    }
+  },
+  "nigiri": {
+    "minutes": 5,
+    "tools": ["pen", "glue"],
+    "place": {
+      "x": 2770,
+      "y": 705,
+      "tilt": -3
+    }
   }
 }

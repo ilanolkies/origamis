@@ -16,3 +16,8 @@ export const edgeReach = angle => 1 / (Math.cos((angle * Math.PI) / 180) + Math.
 
 export const HALVE_UP = { from: [-1, 0], to: [1, 0], mover: [0, -1], kind: 'valley', bend: 1 }
 export const HALVE_DOWN = { from: [-1, 0], to: [1, 0], mover: [0, 1], kind: 'valley', bend: -1 }
+
+export const LONG = Math.SQRT2 / 2
+export const SHORT = LONG / 2
+export const HALF_SHEET = [[-LONG, -SHORT], [LONG, -SHORT], [LONG, SHORT], [-LONG, SHORT]]
+export const HALF_SHEET_CM = `${SIDE_CM} × ${SIDE_CM / 2} cm`

@@ -10,6 +10,8 @@ import { leaf } from './flowers/leaf.js'
 import { stem } from './flowers/stem.js'
 import { tulip } from './flowers/tulip.js'
 import { carrot } from './food/carrot.js'
+import { iceCream } from './food/ice-cream.js'
+import { nigiri } from './food/nigiri.js'
 import { onigiri } from './food/onigiri.js'
 import { watermelon } from './food/watermelon.js'
 import { fuji } from './seasonal/fuji.js'
@@ -20,7 +22,7 @@ export const categories = {
   Flowers: [tulip, leaf, stem],
   Animals: [cat, dog, whale],
   'Animal faces': [catFace, dogFace, fox, rabbit, pig],
-  Food: [watermelon, onigiri, carrot],
+  Food: [watermelon, onigiri, carrot, iceCream, nigiri],
   Vehicles: [sailboat, rocket],
   Seasonal: [fuji],
 }
