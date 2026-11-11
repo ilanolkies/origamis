@@ -3,8 +3,8 @@
     "minutes": 5,
     "tools": ["scissors"],
     "place": {
-      "x": 44,
-      "y": 78,
+      "x": 172,
+      "y": 65,
       "tilt": -4
     }
   },
@@ -12,9 +12,9 @@
     "minutes": 8,
     "tools": ["pen"],
     "place": {
-      "x": 1960,
-      "y": 68,
-      "tilt": -4
+      "x": 1390,
+      "y": 67,
+      "tilt": 3
     }
   },
   "cat-face": {
@@ -22,7 +22,7 @@
     "tools": ["pen"],
     "place": {
       "x": 740,
-      "y": 910,
+      "y": 958,
       "tilt": -4
     }
   },
@@ -31,7 +31,7 @@
     "tools": ["pen"],
     "place": {
       "x": 172,
-      "y": 697,
+      "y": 745,
       "tilt": 3
     }
   },
@@ -40,7 +40,7 @@
     "tools": ["pen"],
     "place": {
       "x": 72,
-      "y": 948,
+      "y": 996,
       "tilt": -4
     }
   },
@@ -49,7 +49,7 @@
     "tools": ["pen"],
     "place": {
       "x": 380,
-      "y": 840,
+      "y": 888,
       "tilt": 3
     }
   },
@@ -58,7 +58,7 @@
     "tools": ["pen"],
     "place": {
       "x": 600,
-      "y": 688,
+      "y": 736,
       "tilt": -4
     }
   },
@@ -66,62 +66,62 @@
     "minutes": 3,
     "tools": ["pen"],
     "place": {
-      "x": 1450,
-      "y": 700,
-      "tilt": -3
+      "x": 1898,
+      "y": 745,
+      "tilt": 4
     }
   },
   "onigiri": {
     "minutes": 4,
     "tools": ["glue"],
     "place": {
-      "x": 1780,
-      "y": 690,
-      "tilt": 4
+      "x": 1470,
+      "y": 736,
+      "tilt": -3
     }
   },
   "carrot": {
     "minutes": 4,
     "tools": ["pen", "glue"],
     "place": {
-      "x": 2110,
-      "y": 700,
-      "tilt": -2
+      "x": 1998,
+      "y": 996,
+      "tilt": 2
     }
   },
   "sailboat": {
     "minutes": 3,
     "tools": ["glue"],
     "place": {
-      "x": 44,
-      "y": 1450,
-      "tilt": 3
+      "x": 1370,
+      "y": 1427,
+      "tilt": -3
     }
   },
   "rocket": {
     "minutes": 5,
     "tools": ["pen", "glue"],
     "place": {
-      "x": 374,
-      "y": 1440,
-      "tilt": -3
+      "x": 1660,
+      "y": 1517,
+      "tilt": 2
     }
   },
   "fuji": {
     "minutes": 2,
     "tools": ["none"],
     "place": {
-      "x": 1000,
-      "y": 1460,
-      "tilt": -2
+      "x": 69,
+      "y": 1437,
+      "tilt": 2
     }
   },
   "leaf": {
     "minutes": 3,
     "tools": ["pen"],
     "place": {
-      "x": 374,
-      "y": 78,
+      "x": 600,
+      "y": 56,
       "tilt": 3
     }
   },
@@ -129,8 +129,8 @@
     "minutes": 3,
     "tools": ["none"],
     "place": {
-      "x": 704,
-      "y": 78,
+      "x": 72,
+      "y": 316,
       "tilt": -2
     }
   },
@@ -138,71 +138,71 @@
     "minutes": 8,
     "tools": ["pen"],
     "place": {
-      "x": 2290,
-      "y": 70,
-      "tilt": 3
+      "x": 1750,
+      "y": 52,
+      "tilt": -2
     }
   },
   "whale": {
     "minutes": 5,
     "tools": ["pen"],
     "place": {
-      "x": 2620,
-      "y": 90,
-      "tilt": -3
+      "x": 1560,
+      "y": 287,
+      "tilt": 4
     }
   },
   "ice-cream": {
     "minutes": 5,
     "tools": ["pen", "glue"],
     "place": {
-      "x": 2440,
-      "y": 690,
-      "tilt": 3
+      "x": 1690,
+      "y": 888,
+      "tilt": -4
     }
   },
   "nigiri": {
     "minutes": 5,
     "tools": ["pen", "glue"],
     "place": {
-      "x": 2770,
-      "y": 705,
-      "tilt": -3
+      "x": 1330,
+      "y": 958,
+      "tilt": 3
     }
   },
   "christmas-tree": {
     "minutes": 8,
     "tools": ["pen", "glue"],
     "place": {
-      "x": 1330,
-      "y": 1450,
-      "tilt": 3
+      "x": 399,
+      "y": 1407,
+      "tilt": -4
     }
   },
   "snowman": {
     "minutes": 8,
     "tools": ["pen", "glue"],
     "place": {
-      "x": 1660,
-      "y": 1465,
-      "tilt": -3
+      "x": 589,
+      "y": 1607,
+      "tilt": 3
     }
   },
   "cherry-blossom": {
     "minutes": 12,
     "tools": ["pen", "glue"],
     "place": {
-      "x": 1034,
-      "y": 82,
-      "tilt": 3
+      "x": 380,
+      "y": 208,
+      "tilt": 4
     }
   },
   "sunflower": {
     "minutes": 4,
     "tools": ["pen"],
     "place": {
-      "x": 1364,
-      "y": 76,
+      "x": 740,
+      "y": 278,
       "tilt": -3
     }
   },
@@ -210,27 +210,27 @@
     "minutes": 5,
     "tools": ["pen"],
     "place": {
-      "x": 2585,
-      "y": 1455,
-      "tilt": 3
+      "x": 2270,
+      "y": 1427,
+      "tilt": -4
     }
   },
   "helmet": {
     "minutes": 4,
     "tools": ["none"],
     "place": {
-      "x": 44,
-      "y": 2090,
-      "tilt": -3
+      "x": 89,
+      "y": 2107,
+      "tilt": 3
     }
   },
   "heart": {
     "minutes": 4,
     "tools": ["none"],
     "place": {
-      "x": 1990,
-      "y": 1450,
-      "tilt": 3
+      "x": 259,
+      "y": 1647,
+      "tilt": -4
     }
   }
 }
