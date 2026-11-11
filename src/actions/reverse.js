@@ -18,6 +18,7 @@ import {
 import { axis, byRank, foldAlong, halves, motionPhase, plain, tracked } from './motion.js'
 
 const LEVEL = 6
+const SINK_LEVEL = 7
 const SOUNDS = ['グイッ', 'パタン']
 
 const sideOf = ({ from, to, mover }) => (cross(sub(to, from), sub(mover, from)) > 0 ? 1 : -1)
@@ -109,3 +110,4 @@ const reversing = outside => ({
 
 export const insideReverse = reversing(false)
 export const outsideReverse = reversing(true)
+export const sink = { ...reversing(false), level: SINK_LEVEL }
