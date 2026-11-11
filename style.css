@@ -34,6 +34,8 @@ body {
   background-image: linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 28px 28px;
+  background-attachment: fixed;
+  overflow-x: clip;
 }
 
 .masthead {
@@ -77,17 +79,35 @@ h1 span {
   color: var(--green);
 }
 
-.desk {
-  flex: 1;
-  min-height: 0;
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
   gap: 28px;
-  padding: 12px 28px 26px;
+  padding: calc(var(--mast, 70px) + 12px) 28px 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.viewing {
+  overflow: hidden;
+}
+
+.viewing .viewer {
+  visibility: visible;
+}
+
+.docked .viewer > *,
+.docked .controls,
+.docked #steps {
+  pointer-events: auto;
 }
 
 .board {
   min-height: 0;
+  padding-bottom: 26px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -97,29 +117,6 @@ h1 span {
   position: relative;
   flex: 1;
   min-height: 280px;
-  border: 3.5px solid var(--ink);
-  border-radius: var(--scribble);
-  background: var(--sheet);
-  box-shadow: 7px 8px 0 var(--ink);
-  overflow: hidden;
-}
-
-.frame::before,
-.frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.frame::before {
-  background: radial-gradient(circle, rgb(240 96 141 / 0.5) 1.7px, transparent 2.1px) 0 0 / 13px 13px;
-  mask-image: linear-gradient(135deg, #000, transparent 42%);
-}
-
-.frame::after {
-  background: radial-gradient(circle, rgb(79 159 230 / 0.45) 1.5px, transparent 1.9px) 0 0 / 11px 11px;
-  mask-image: linear-gradient(315deg, #000, transparent 34%);
 }
 
 #stage {
@@ -298,7 +295,7 @@ h1 span {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  padding: 4px 10px 10px 4px;
+  padding: 4px 10px 26px 4px;
 }
 
 .part header {
@@ -433,6 +430,7 @@ h1 span {
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
   z-index: 10;
   pointer-events: none;
 }
@@ -509,6 +507,59 @@ body:has(.sketchpad) {
 .piece:focus-visible {
   outline: 3px dashed var(--blue);
   outline-offset: 6px;
+}
+
+.piece,
+.chip {
+  transition: opacity 300ms;
+}
+
+.viewing .sketchpad {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.viewing .piece .hit {
+  pointer-events: none;
+}
+
+.viewing .piece:not(.chosen),
+.viewing .chip {
+  opacity: 0;
+}
+
+.chosen svg,
+.viewing .label {
+  visibility: hidden;
+}
+
+#steps,
+.controls,
+.model {
+  transition: transform 800ms cubic-bezier(0.2, 0.9, 0.25, 1.04), opacity 400ms;
+}
+
+.docked .controls {
+  transition-delay: 120ms;
+}
+
+.docked .model {
+  transition-delay: 240ms;
+}
+
+:root:not(.docked) #steps {
+  transform: translateX(115%);
+  opacity: 0;
+}
+
+:root:not(.docked) .controls {
+  transform: translateY(160%);
+  opacity: 0;
+}
+
+:root:not(.docked) .model {
+  transform: translateX(160%) rotate(1.5deg);
+  opacity: 0;
 }
 
 .label {
@@ -629,9 +680,16 @@ body:has(.sketchpad) {
     height: auto;
   }
 
-  .desk {
+  .viewer {
     grid-template-columns: minmax(0, 1fr);
-    padding: 10px 16px 24px;
+    align-content: start;
+    grid-auto-rows: max-content;
+    overflow-y: auto;
+    padding: calc(var(--mast, 60px) + 8px) 16px 24px;
+  }
+
+  .board {
+    padding-bottom: 0;
   }
 
   .masthead {

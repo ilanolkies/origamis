@@ -1,167 +1,316 @@
+import catalog from './models/catalog.json' with { type: 'json' }
+import categories from './models/categories.json' with { type: 'json' }
 import { models } from './models/index.js'
-import { defs, renderFrame, thumbnail } from './sketch.js'
+import { defs, renderFrame } from './sketch.js'
 import { buildTimeline } from './timeline.js'
+import { createViewer } from './viewer.js'
 
-const SOUNDS = {
-  fold: ['パタッ', 'ペタッ', 'スッ', 'キュッ'],
-  swap: ['シュッ'],
-  join: ['ポンッ'],
-  draw: ['カキカキ'],
-}
 const BOIL_MS = 150
+const LEVELS = 5
+const PIECE_SIZE = 440
+const MARGIN = 400
+const DRAG_THRESHOLD = 6
+const PAN_MS = 700
+const EDGE = 24
+const FLIGHT_MS = 850
+const UNFOLD_MS = 2200
+const FOLD_UP_MS = 900
+const RETURN_MS = 700
+const SETTLE_MS = 400
+const TITLE = document.title
 
-const chosen = new URLSearchParams(location.search).get('model')
-const model = models.find(candidate => candidate.id === chosen) ?? models[0]
-const timeline = buildTimeline(model)
-const total = timeline.steps.length
+const root = document.documentElement
+const masthead = document.querySelector('.masthead')
+const home = document.querySelector('#home')
+const tag = document.querySelector('#model')
+const sketchpad = document.querySelector('#gallery')
 const stage = document.querySelector('#stage')
-const layer = document.querySelector('#frame')
-const shouts = document.querySelector('#sfx')
-const panel = document.querySelector('#steps')
-const count = document.querySelector('#count')
-const caption = document.querySelector('#caption')
-const previousButton = document.querySelector('#previous')
-const nextButton = document.querySelector('#next')
 const calm = matchMedia('(prefers-reduced-motion: reduce)')
 
-document.body.insertAdjacentHTML('afterbegin', defs)
-document.title = `${model.name} ${model.kana}`
-document.querySelector('#model').innerHTML = `<span lang="ja">${model.kana}</span> ${model.name}`
-stage.setAttribute('aria-label', `Animated folding of the ${model.name.toLowerCase()}`)
+const viewer = createViewer({
+  stage,
+  layer: document.querySelector('#frame'),
+  shouts: document.querySelector('#sfx'),
+  panel: document.querySelector('#steps'),
+  count: document.querySelector('#count'),
+  caption: document.querySelector('#caption'),
+  previousButton: document.querySelector('#previous'),
+  nextButton: document.querySelector('#next'),
+})
 
-let position = 0
-let landing = null
-let run = 0
-let boil = 0
+const pieces = models.map(model => {
+  const timeline = buildTimeline(model)
+  const items = timeline.steps.at(-1).after
+  return {
+    model,
+    facts: catalog[model.id],
+    steps: timeline.steps.length,
+    frame: { view: timeline.fitView(items), items },
+  }
+})
 
-panel.innerHTML = timeline.sections
-  .map(
-    section => `
-      <section class="part">
-        <header>
-          <span class="kanji">${section.kanji}</span>
-          <div><h2>${section.name}</h2><p>${section.paper}</p></div>
-          ${thumbnail(section.preview, timeline.fitView(section.preview))}
-        </header>
-        <ol>
-          ${section.steps
-            .map(
-              step => `
-                <li>
-                  <button type="button" class="step" data-step="${step.number}">
-                    <span class="number">${step.number}</span>
-                    <span class="text">${step.text}</span>
-                    <span class="stamp" aria-hidden="true">済</span>
-                  </button>
-                </li>`,
-            )
-            .join('')}
-        </ol>
-      </section>`,
+const plural = (count, word) => `<b>${count}</b> ${word}${count === 1 ? '' : 's'}`
+const at = ({ x, y }) => `left: ${x + MARGIN}px; top: ${y + MARGIN}px`
+
+const card = ({ model, facts, steps }) => `
+      <a class="piece" href="?model=${model.id}" data-model="${model.id}" style="${at(facts.place)}; --tilt: ${facts.place.tilt}deg">
+        <svg viewBox="0 0 1 1" role="img" aria-label="${model.name}"></svg>
+        <span class="label">
+          <span class="kana" lang="ja">${model.kana}</span>
+          <span class="name">${model.name}</span>
+          <span class="tag">${facts.category}</span>
+          <span class="facts">
+            <span>${plural(model.parts.length, 'piece')}</span>
+            <span>${plural(steps, 'step')}</span>
+            <span><b>${facts.minutes}</b> min</span>
+          </span>
+          <span class="level" role="img" aria-label="Difficulty ${facts.difficulty} of ${LEVELS}">
+            <span>Difficulty</span>
+            <span class="bar"><span class="fill" style="width: ${(facts.difficulty / LEVELS) * 100}%"></span></span>
+            <span>${facts.difficulty}/${LEVELS}</span>
+          </span>
+          <span class="needs">${model.sheetCm} cm paper · ${facts.tools.join(', ')}</span>
+        </span>
+      </a>`
+
+const reach = (axis, size) =>
+  Math.max(
+    ...pieces.map(({ facts }) => facts.place[axis] + size),
+    ...Object.values(categories).map(place => place[axis] + size),
   )
-  .join('')
 
-const paint = frame => {
-  const { viewBox, markup } = renderFrame(frame, boil)
-  stage.setAttribute('viewBox', viewBox)
-  layer.innerHTML = markup
-}
+document.body.insertAdjacentHTML('afterbegin', defs)
+sketchpad.innerHTML = `
+  <div class="world" style="width: ${reach('x', PIECE_SIZE) + 2 * MARGIN}px; height: ${reach('y', PIECE_SIZE) + 2 * MARGIN}px">
+    ${Object.entries(categories)
+      .map(([name, place]) => `<h2 class="chip" style="${at(place)}">${name}</h2>`)
+      .join('')}
+    ${pieces.map(card).join('')}
+  </div>`
 
-const describe = current => {
-  const done = current > total
-  count.textContent = done ? 'できた！' : `Step ${current} / ${total}`
-  caption.textContent = done ? `Your ${model.name.toLowerCase()} is done.` : timeline.steps[current - 1].text
-  previousButton.disabled = position === 0 && landing === null
-  nextButton.disabled = position === total && landing === null
-  for (const button of panel.querySelectorAll('.step')) {
-    const stepNumber = Number(button.dataset.step)
-    button.classList.toggle('done', stepNumber < current)
-    button.classList.toggle('current', stepNumber === current)
-    if (stepNumber === current) button.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+sketchpad.scrollLeft = MARGIN - 20
+sketchpad.scrollTop = MARGIN - 20
+
+const outline = items => {
+  const points = items
+    .filter(item => item.poly)
+    .flatMap(item => item.poly)
+    .sort((a, b) => a[0] - b[0] || a[1] - b[1])
+  const turn = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+  const chain = list => {
+    const half = []
+    for (const point of list) {
+      while (half.length > 1 && turn(half.at(-2), half.at(-1), point) <= 0) half.pop()
+      half.push(point)
+    }
+    return half.slice(0, -1)
   }
+  return [...chain(points), ...chain([...points].reverse())]
 }
 
-const rest = () => {
-  paint(timeline.idle(position))
-  describe(position + 1)
-}
+const drawings = [...sketchpad.querySelectorAll('.piece svg')]
 
-const shout = kind => {
-  const words = SOUNDS[kind]
-  const word = document.createElement('span')
-  word.className = 'shout'
-  word.textContent = words[Math.floor(Math.random() * words.length)]
-  word.style.left = `${8 + Math.random() * 60}%`
-  word.style.top = `${6 + Math.random() * 22}%`
-  word.style.setProperty('--turn', `${-14 + Math.random() * 28}deg`)
-  word.addEventListener('animationend', () => word.remove())
-  shouts.append(word)
-}
-
-const finish = () => {
-  if (landing === null) return
-  position = landing
-  landing = null
-  run++
-}
-
-const animate = (index, backward) => {
-  const phases = backward ? [...timeline.steps[index].phases].reverse() : timeline.steps[index].phases
-  const mine = ++run
-  let active = 0
-  let started = null
-  landing = backward ? index : index + 1
-  describe(index + 1)
-  const tick = now => {
-    if (mine !== run) return
-    started ??= now
-    const phase = phases[active]
-    const t = Math.min(1, (now - started) / phase.duration)
-    if (!calm.matches) boil = Math.floor(now / BOIL_MS)
-    paint(phase.frame(backward ? 1 - t : t))
-    if (t < 1) return requestAnimationFrame(tick)
-    if (!backward) shout(phase.kind)
-    active++
-    started = null
-    if (active < phases.length) return requestAnimationFrame(tick)
-    finish()
-    rest()
-  }
-  requestAnimationFrame(tick)
-}
-
-const next = () => {
-  finish()
-  if (position < total) animate(position, false)
-  else rest()
-}
-
-const previous = () => {
-  finish()
-  if (position > 0) animate(position - 1, true)
-  else rest()
-}
-
-const show = stepNumber => {
-  finish()
-  position = stepNumber - 1
-  animate(position, false)
-}
-
-nextButton.addEventListener('click', next)
-previousButton.addEventListener('click', previous)
-panel.addEventListener('click', event => {
-  const button = event.target.closest('.step')
-  if (button) show(Number(button.dataset.step))
+pieces.forEach((piece, index) => {
+  const hull = outline(piece.frame.items).map(([x, y]) => `${x.toFixed(4)},${(-y).toFixed(4)}`)
+  drawings[index].innerHTML = `<polygon class="hit" points="${hull.join(' ')}"/><g class="art"></g>`
 })
-addEventListener('keydown', event => {
-  if (event.key === 'ArrowRight') next()
-  if (event.key === 'ArrowLeft') previous()
-})
+
+const arts = drawings.map(drawing => drawing.querySelector('.art'))
+
+const paintGallery = seed =>
+  pieces.forEach((piece, index) => {
+    const { viewBox, markup } = renderFrame(piece.frame, seed + index * 17)
+    drawings[index].setAttribute('viewBox', viewBox)
+    arts[index].innerHTML = markup
+  })
+
+let boil = 0
+paintGallery(boil)
 setInterval(() => {
-  if (landing !== null || calm.matches) return
-  boil++
-  paint(timeline.idle(position))
+  if (!calm.matches && !root.classList.contains('viewing')) paintGallery(++boil)
 }, BOIL_MS)
 
-rest()
+sketchpad.addEventListener('pointermove', event => {
+  const label = event.target.closest('.piece')?.querySelector('.label')
+  if (!label) return
+  label.style.setProperty('--x', `${Math.min(event.clientX + 18, innerWidth - label.offsetWidth - 14)}px`)
+  label.style.setProperty('--y', `${Math.min(event.clientY + 18, innerHeight - label.offsetHeight - 14)}px`)
+})
+
+let drag = null
+let dragged = false
+
+sketchpad.addEventListener('pointerdown', event => {
+  if (event.pointerType !== 'mouse' || event.button !== 0) return
+  drag = { x: event.clientX, y: event.clientY, left: sketchpad.scrollLeft, top: sketchpad.scrollTop }
+  dragged = false
+})
+
+sketchpad.addEventListener('pointermove', event => {
+  if (!drag) return
+  const dx = event.clientX - drag.x
+  const dy = event.clientY - drag.y
+  if (!dragged && Math.hypot(dx, dy) < DRAG_THRESHOLD) return
+  if (!dragged) {
+    dragged = true
+    sketchpad.setPointerCapture(event.pointerId)
+    sketchpad.classList.add('panning')
+  }
+  sketchpad.scrollLeft = drag.left - dx
+  sketchpad.scrollTop = drag.top - dy
+})
+
+const release = () => {
+  drag = null
+  sketchpad.classList.remove('panning')
+}
+
+sketchpad.addEventListener('pointerup', release)
+sketchpad.addEventListener('pointercancel', release)
+sketchpad.addEventListener(
+  'click',
+  event => {
+    if (!dragged) return
+    event.preventDefault()
+    dragged = false
+  },
+  true,
+)
+
+const measure = () => root.style.setProperty('--mast', `${masthead.offsetHeight}px`)
+measure()
+addEventListener('resize', measure)
+
+const spotOf = piece => {
+  const box = piece.getBoundingClientRect()
+  return {
+    x: box.left + box.width / 2,
+    y: box.top + box.height / 2,
+    size: box.width,
+    turn: getComputedStyle(piece.querySelector('svg')).transform,
+  }
+}
+
+const placed = ({ x, y, size, turn = 'none' }) => {
+  const box = stage.getBoundingClientRect()
+  const dx = x - (box.left + box.width / 2)
+  const dy = y - (box.top + box.height / 2)
+  const grow = size / Math.min(box.width, box.height)
+  return `translate(${dx}px, ${dy}px) ${turn === 'none' ? '' : turn} scale(${grow})`
+}
+
+const duration = ms => (calm.matches ? 0 : ms)
+
+const ease = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
+
+const reveal = (piece, done) => {
+  const box = piece.getBoundingClientRect()
+  const top = masthead.offsetHeight
+  const fits =
+    box.left >= EDGE && box.right <= innerWidth - EDGE && box.top >= top && box.bottom <= innerHeight - EDGE
+  if (fits) return done()
+  const from = [sketchpad.scrollLeft, sketchpad.scrollTop]
+  const to = [
+    from[0] + box.left + box.width / 2 - innerWidth / 2,
+    from[1] + box.top + box.height / 2 - (top + innerHeight) / 2,
+  ]
+  const ms = duration(PAN_MS)
+  let start = null
+  const glide = now => {
+    start ??= now
+    const k = ms ? ease(Math.min(1, (now - start) / ms)) : 1
+    sketchpad.scrollTo(from[0] + (to[0] - from[0]) * k, from[1] + (to[1] - from[1]) * k)
+    if (k < 1) return requestAnimationFrame(glide)
+    done()
+  }
+  requestAnimationFrame(glide)
+}
+
+let shown = null
+let busy = false
+
+const open = (model, done) => {
+  busy = true
+  shown = model
+  const piece = sketchpad.querySelector(`[data-model="${model.id}"]`)
+  reveal(piece, () => fly(model, piece, done))
+}
+
+const fly = (model, piece, done) => {
+  const from = spotOf(piece)
+  viewer.load(model)
+  tag.innerHTML = `<span lang="ja">${model.kana}</span> ${model.name}`
+  document.title = `${model.name} ${model.kana}`
+  piece.classList.add('chosen')
+  root.classList.add('viewing')
+  const flight = stage.animate([{ transform: placed(from) }, { transform: 'none' }], {
+    duration: duration(FLIGHT_MS),
+    easing: 'cubic-bezier(0.5, 0, 0.2, 1)',
+  })
+  flight.finished.then(() => {
+    busy = false
+    root.classList.add('docked')
+    viewer.start()
+    viewer.sweep(0, UNFOLD_MS)
+    done()
+  })
+}
+
+const close = done => {
+  busy = true
+  const piece = sketchpad.querySelector('.chosen')
+  viewer.stop()
+  root.classList.remove('docked')
+  document.title = TITLE
+  viewer.sweep(viewer.total, duration(FOLD_UP_MS), () => {
+    const flight = stage.animate([{ transform: 'none' }, { transform: placed(spotOf(piece)) }], {
+      duration: duration(RETURN_MS),
+      easing: 'cubic-bezier(0.5, 0, 0.25, 1)',
+      fill: 'forwards',
+    })
+    flight.finished.then(() => {
+      root.classList.remove('viewing')
+      piece.classList.remove('chosen')
+      flight.cancel()
+      shown = null
+      busy = false
+      done()
+    })
+  })
+}
+
+const wanted = () => models.find(model => model.id === new URLSearchParams(location.search).get('model')) ?? null
+
+const sync = () => {
+  if (busy) return
+  const model = wanted()
+  if (model === shown) return
+  if (shown) return close(sync)
+  if (model) open(model, sync)
+}
+
+const go = id => {
+  history.pushState(null, '', id ? `?model=${id}` : location.pathname)
+  sync()
+}
+
+sketchpad.addEventListener('click', event => {
+  const piece = event.target.closest('.piece')
+  if (!piece || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  event.preventDefault()
+  go(piece.dataset.model)
+})
+
+home.addEventListener('click', event => {
+  event.preventDefault()
+  if (shown) go(null)
+})
+
+addEventListener('keydown', event => {
+  if (event.key === 'Escape' && shown) go(null)
+})
+
+addEventListener('popstate', sync)
+
+if (location.search && !wanted()) history.replaceState(null, '', location.pathname)
+if (wanted()) document.fonts.ready.then(() => setTimeout(sync, duration(SETTLE_MS)))
