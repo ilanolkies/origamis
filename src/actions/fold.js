@@ -48,7 +48,7 @@ const swingPhase = (before, crease, tone) => {
   const eye = lerp(viewFrom.center, viewTo.center, 0.5)
   const lift = crease.kind === 'valley' ? 1 : -1
   const [lineFrom, lineTo] = creaseSegment(before, crease.from, crease.to)
-  const stays = scene(result.stays, tone)
+  const stays = scene(result.stays, { tone })
 
   const swing = (p, angle) => {
     const foot = add(crease.from, scale(axis, dot(sub(p, crease.from), axis)))

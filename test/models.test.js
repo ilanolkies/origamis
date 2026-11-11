@@ -13,6 +13,7 @@ test('every category has a place on the board and every model a catalog entry', 
 })
 
 const creases = new Set(['valley', 'mountain'])
+const moves = new Set(['turn', 'rotate'])
 
 for (const model of models) {
   test(`${model.id} only uses registered actions`, () => {
@@ -25,10 +26,14 @@ for (const model of models) {
       const sheetArea = Math.abs(area(model.sheet))
       let faces = sheet(model.sheet)
       for (const step of part.steps) {
-        for (const action of step.actions.filter(action => creases.has(action.kind))) {
-          const result = fold(faces, action)
-          assert.ok(result.moving.length > 0)
-          faces = result.faces
+        for (const action of step.actions.filter(action => creases.has(action.kind) || moves.has(action.kind))) {
+          if (creases.has(action.kind)) {
+            const result = fold(faces, action)
+            assert.ok(result.moving.length > 0)
+            faces = result.faces
+          } else {
+            faces = actions[action.kind].perform({ faces, doodles: [], tone: part.tone }, action).paper.faces
+          }
           const report = check(faces, sheetArea)
           assert.ok(report.areaError < 1e-9)
           assert.equal(report.tears, 0)
