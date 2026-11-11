@@ -30,6 +30,7 @@ const TONES = {
   helmet: [104, 88, 164],
   heart: [226, 72, 100],
   cup: [86, 164, 214],
+  roof: [204, 78, 62],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]
