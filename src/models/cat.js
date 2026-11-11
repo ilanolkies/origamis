@@ -40,6 +40,36 @@ const face = [
   [[0.08, 0.545], [0.07, 0.49]],
 ]
 
+const head = {
+  id: 'head',
+  name: 'Head',
+  kanji: '頭',
+  tone: 'fur',
+  paper: `${SIDE_CM} cm square, orange on one side`,
+  steps: [
+    {
+      text: 'White side up, a corner toward you. Fold the bottom corner up to the top corner.',
+      folds: [HALVE],
+    },
+    {
+      text: `Fold the top point behind. The crease sits ${cm(1 - BROW)} cm below the tip.`,
+      folds: [{ from: [-1, BROW], to: [1, BROW], mover: [0, 1], kind: 'mountain', bend: 1 }],
+    },
+    {
+      text: `Fold the right corner up behind to make an ear. The crease runs from the middle of the bottom edge to a spot ${cm(length(sub([1, 0], cheek)))} cm up the right edge.`,
+      folds: [{ from: CENTRE, to: cheek, mover: [1, 0], kind: 'mountain', bend: -1 }],
+    },
+    {
+      text: 'Repeat on the left. The two ears should sit level.',
+      folds: [{ from: CENTRE, to: mirror(cheek), mover: [-1, 0], kind: 'mountain', bend: 1 }],
+    },
+    {
+      text: 'Draw the face: happy eyes, a nose, whiskers and three stripes.',
+      draw: face,
+    },
+  ],
+}
+
 export const cat = {
   id: 'cat',
   name: 'Sitting cat',
@@ -47,35 +77,7 @@ export const cat = {
   sheet: DIAMOND,
   sheetCm: SIDE_CM,
   parts: [
-    {
-      id: 'head',
-      name: 'Head',
-      kanji: '頭',
-      tone: 'fur',
-      paper: `${SIDE_CM} cm square, orange on one side`,
-      steps: [
-        {
-          text: 'White side up, a corner toward you. Fold the bottom corner up to the top corner.',
-          folds: [HALVE],
-        },
-        {
-          text: `Fold the top point behind. The crease sits ${cm(1 - BROW)} cm below the tip.`,
-          folds: [{ from: [-1, BROW], to: [1, BROW], mover: [0, 1], kind: 'mountain', bend: 1 }],
-        },
-        {
-          text: `Fold the right corner up behind to make an ear. The crease runs from the middle of the bottom edge to a spot ${cm(length(sub([1, 0], cheek)))} cm up the right edge.`,
-          folds: [{ from: CENTRE, to: cheek, mover: [1, 0], kind: 'mountain', bend: -1 }],
-        },
-        {
-          text: 'Repeat on the left. The two ears should sit level.',
-          folds: [{ from: CENTRE, to: mirror(cheek), mover: [-1, 0], kind: 'mountain', bend: 1 }],
-        },
-        {
-          text: 'Draw the face: happy eyes, a nose, whiskers and three stripes.',
-          draw: face,
-        },
-      ],
-    },
+    head,
     {
       id: 'body',
       name: 'Body',
@@ -108,4 +110,13 @@ export const cat = {
     seat: [0, 1 - NECK_DEPTH],
     text: `Slide the body's top point about ${Math.round(NECK_DEPTH * CM)} cm up behind the face, in front of the folded-down flap. A dab of glue keeps it in place.`,
   },
+}
+
+export const catFace = {
+  id: 'cat-face',
+  name: 'Cat face',
+  kana: 'ねこ',
+  sheet: DIAMOND,
+  sheetCm: SIDE_CM,
+  parts: [head],
 }

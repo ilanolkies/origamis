@@ -3,12 +3,77 @@
     "category": "Flowers",
     "difficulty": 1,
     "minutes": 5,
-    "tools": ["scissors"]
+    "tools": ["scissors"],
+    "place": {
+      "x": 44,
+      "y": 78,
+      "tilt": -4
+    }
   },
   "cat": {
     "category": "Animals",
     "difficulty": 2,
     "minutes": 8,
-    "tools": ["pen"]
+    "tools": ["pen"],
+    "place": {
+      "x": 481,
+      "y": 68,
+      "tilt": -4
+    }
+  },
+  "cat-face": {
+    "category": "Animal faces",
+    "difficulty": 1,
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 740,
+      "y": 760,
+      "tilt": -4
+    }
+  },
+  "dog-face": {
+    "category": "Animal faces",
+    "difficulty": 1,
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 172,
+      "y": 547,
+      "tilt": 3
+    }
+  },
+  "fox-face": {
+    "category": "Animal faces",
+    "difficulty": 1,
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 72,
+      "y": 798,
+      "tilt": -4
+    }
+  },
+  "rabbit-face": {
+    "category": "Animal faces",
+    "difficulty": 1,
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 380,
+      "y": 690,
+      "tilt": 3
+    }
+  },
+  "pig-face": {
+    "category": "Animal faces",
+    "difficulty": 1,
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 600,
+      "y": 538,
+      "tilt": -4
+    }
   }
 }
