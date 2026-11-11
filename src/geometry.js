@@ -26,6 +26,8 @@ export const compose = (a, b) => [
   a[3] * b[2] + a[4] * b[5] + a[5],
 ]
 
+export const det = m => m[0] * m[4] - m[1] * m[3]
+
 export const invert = m => {
   const [a, b, tx, c, d, ty] = m
   const det = a * d - b * c
@@ -177,4 +179,23 @@ export const creaseSegment = (faces, from, to) => {
     high = Math.max(high, t1)
   }
   return [add(from, scale(d, low)), add(from, scale(d, high))]
+}
+
+export const within = (poly, from, to) => {
+  const ring = counterClockwise(poly)
+  const d = sub(to, from)
+  let t0 = 0
+  let t1 = 1
+  for (let i = 0; i < ring.length; i++) {
+    const edge = sub(ring[(i + 1) % ring.length], ring[i])
+    const offset = cross(edge, sub(from, ring[i]))
+    const slope = cross(edge, d)
+    if (Math.abs(slope) < 1e-12) {
+      if (offset < -EPSILON) return null
+      continue
+    }
+    if (slope > 0) t0 = Math.max(t0, -offset / slope)
+    else t1 = Math.min(t1, -offset / slope)
+  }
+  return (t1 - t0) * length(d) > EPSILON ? [lerp(from, to, t0), lerp(from, to, t1)] : null
 }

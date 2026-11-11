@@ -1,5 +1,6 @@
 import { add, apply, bounds, compose, polar } from '../geometry.js'
 import { ease, fitView, look, mixView } from '../scene.js'
+import { moveFolds } from './fold.js'
 import { centreOf } from './turn.js'
 
 const SOUNDS = ['クルン']
@@ -9,9 +10,13 @@ const rotation = (centre, degrees) => {
   return [c, -s, centre[0] - c * centre[0] + s * centre[1], s, c, centre[1] - s * centre[0] - c * centre[1]]
 }
 
+const spinFaces = (faces, m) =>
+  faces.map(face => ({ ...face, poly: face.poly.map(p => apply(m, p)), matrix: compose(m, face.matrix) }))
+
 const spin = (paper, m) => ({
   ...paper,
-  faces: paper.faces.map(face => ({ ...face, poly: face.poly.map(p => apply(m, p)), matrix: compose(m, face.matrix) })),
+  faces: spinFaces(paper.faces, m),
+  folds: moveFolds(paper.folds, m, faces => spinFaces(faces, m)),
   doodles: paper.doodles.map(doodle => ({
     ...doodle,
     strokes: doodle.strokes.map(stroke => stroke.map(p => apply(m, p))),

@@ -154,6 +154,11 @@ h1 span {
   stroke-dasharray: 13 6 2 6 2 6;
 }
 
+.crease.kept {
+  stroke-width: 1;
+  opacity: 0.4;
+}
+
 .guide {
   stroke: var(--blue);
   stroke-width: 3.2;

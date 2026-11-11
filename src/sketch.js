@@ -88,6 +88,9 @@ const draw = {
     `<g opacity="${item.opacity ?? 1}">` +
     `<polygon points="${points(item.poly)}" fill="${colour(item)}"/>` +
     (item.colorUp ? `<polygon points="${points(item.poly)}" fill="url(#hatch)"/>` : '') +
+    (item.lines ?? [])
+      .map((line, i) => `<path class="crease kept ${line.kind}" d="${stroke(line.from, line.to, seed + 200 + i, wobble * 0.3)}"/>`)
+      .join('') +
     `<path class="ink" d="${outline(item.poly, seed, wobble)}${outline(item.poly, seed + 100, wobble)}"/>` +
     '</g>',
   shadow: item =>
