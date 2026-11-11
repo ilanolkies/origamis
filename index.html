@@ -14,9 +14,29 @@
   </head>
   <body>
     <header class="masthead">
-      <h1><span lang="ja">折り紙</span> Origami</h1>
+      <h1><a id="home" href="./"><span lang="ja">折り紙</span> Origami</a></h1>
+      <p class="model" id="model"></p>
     </header>
     <main class="sketchpad" id="gallery"></main>
-    <script type="module" src="src/gallery.js"></script>
+    <section class="viewer" aria-label="Folding steps">
+      <div class="board">
+        <div class="frame">
+          <svg id="stage" viewBox="-1.5 -1.5 3 3" role="img">
+            <g id="frame"></g>
+          </svg>
+          <div id="sfx" aria-hidden="true"></div>
+        </div>
+        <div class="controls">
+          <button id="previous" type="button" class="turn" aria-label="Previous step">◀</button>
+          <div class="bubble" aria-live="polite">
+            <span id="count"></span>
+            <p id="caption"></p>
+          </div>
+          <button id="next" type="button" class="turn" aria-label="Next step">▶</button>
+        </div>
+      </div>
+      <aside id="steps" aria-label="Parts and steps"></aside>
+    </section>
+    <script type="module" src="src/main.js"></script>
   </body>
 </html>
