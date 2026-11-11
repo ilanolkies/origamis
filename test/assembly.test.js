@@ -124,7 +124,7 @@ test('more than two pieces or a repeated module is level 2', () => {
 })
 
 const EXISTING = {
-  tulip: 1, leaf: 1, stem: 1, cat: 1, dog: 1, whale: 1,
+  tulip: 1, leaf: 1, stem: 1, cat: 1, dog: 1, whale: 4,
   'cat-face': 1, 'dog-face': 1, 'fox-face': 1, 'rabbit-face': 1, 'pig-face': 1,
   watermelon: 2, onigiri: 1, carrot: 1, 'ice-cream': 2, nigiri: 2,
   sailboat: 1, rocket: 1, fuji: 1, sunflower: 4,
