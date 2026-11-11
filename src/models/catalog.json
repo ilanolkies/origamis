@@ -268,5 +268,14 @@
       "y": 300,
       "tilt": -3
     }
+  },
+  "flapping-bird": {
+    "minutes": 10,
+    "tools": ["none"],
+    "place": {
+      "x": 2120,
+      "y": 80,
+      "tilt": 3
+    }
   }
 }

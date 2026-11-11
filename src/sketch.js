@@ -33,6 +33,7 @@ const TONES = {
   roof: [204, 78, 62],
   piano: [58, 52, 64],
   swan: [214, 226, 238],
+  bird: [228, 92, 64],
   paper: [255, 253, 246],
 }
 const GROUND = [0.03, -0.04]
