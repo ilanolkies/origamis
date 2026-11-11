@@ -15,35 +15,8 @@
   <body>
     <header class="masthead">
       <h1><span lang="ja">折り紙</span> Origami</h1>
-      <p class="model"><span lang="ja">チューリップ</span> Tulip</p>
     </header>
-    <main>
-      <section class="board">
-        <div class="frame">
-          <svg id="stage" viewBox="-1.5 -1.5 3 3" role="img" aria-label="Animated folding of the tulip">
-            <defs>
-              <pattern id="hatch" patternUnits="userSpaceOnUse" width="0.05" height="0.05" patternTransform="rotate(38)">
-                <line class="hatch" x1="0" y1="0.025" x2="0.05" y2="0.025" />
-              </pattern>
-              <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="0.022" />
-              </filter>
-            </defs>
-            <g id="frame"></g>
-          </svg>
-          <div id="sfx" aria-hidden="true"></div>
-        </div>
-        <div class="controls">
-          <button id="previous" type="button" class="turn" aria-label="Previous step">◀</button>
-          <div class="bubble" aria-live="polite">
-            <span id="count"></span>
-            <p id="caption"></p>
-          </div>
-          <button id="next" type="button" class="turn" aria-label="Next step">▶</button>
-        </div>
-      </section>
-      <aside id="steps" aria-label="Parts and steps"></aside>
-    </main>
-    <script type="module" src="src/main.js"></script>
+    <main class="pad" id="gallery"></main>
+    <script type="module" src="src/gallery.js"></script>
   </body>
 </html>

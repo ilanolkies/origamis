@@ -26,10 +26,14 @@ const scene = (faces, tone) =>
   faces.map(face => ({ type: 'face', poly: face.poly, colorUp: face.colorUp, tone, shade: 1 }))
 
 const shifted = (items, offset, opacity = 1) =>
-  items.map(item => ({ ...item, poly: item.poly.map(p => add(p, offset)), opacity }))
+  items.map(item =>
+    item.type === 'doodle'
+      ? { ...item, strokes: item.strokes.map(stroke => stroke.map(p => add(p, offset))), opacity }
+      : { ...item, poly: item.poly.map(p => add(p, offset)), opacity },
+  )
 
 const fitView = items => {
-  const box = bounds(items)
+  const box = bounds(items.filter(item => item.poly))
   return {
     center: [(box.minX + box.maxX) / 2, (box.minY + box.maxY) / 2],
     size: Math.max(1.5, Math.max(box.maxX - box.minX, box.maxY - box.minY) * 1.45),
@@ -118,6 +122,15 @@ const swapPhase = (leaving, arriving) => {
   }
 }
 
+const drawPhase = (items, strokes) => {
+  const view = fitView(items)
+  return {
+    kind: 'draw',
+    duration: 2000,
+    frame: t => ({ view, items: [...items, { type: 'doodle', strokes, progress: t }] }),
+  }
+}
+
 const joinPhase = (base, top, seat) => {
   const viewFrom = fitView(base)
   const viewTo = fitView([...base, ...shifted(top, seat)])
@@ -140,15 +153,24 @@ export const buildTimeline = model => {
   for (const part of model.parts) {
     const section = { name: part.name, kanji: part.kanji, paper: part.paper, steps: [] }
     let faces = sheet(model.sheet)
+    let doodles = []
     part.steps.forEach((step, index) => {
-      const start = scene(faces, part.tone)
+      const start = [...scene(faces, part.tone), ...doodles]
       const swap = index === 0 && shown
       const phases = swap ? [swapPhase(shown, start)] : []
-      const marks = marksFor(faces, step.folds)
-      for (const crease of step.folds) {
-        const phase = foldPhase(faces, crease, part.tone)
-        phases.push(phase)
-        faces = phase.after
+      let marks = []
+      if (step.draw) {
+        const doodle = { type: 'doodle', strokes: step.draw, progress: 1 }
+        phases.push(drawPhase(start, step.draw))
+        marks = [{ ...doodle, guide: true }]
+        doodles = [...doodles, doodle]
+      } else {
+        marks = marksFor(faces, step.folds)
+        for (const crease of step.folds) {
+          const phase = foldPhase(faces, crease, part.tone)
+          phases.push(phase)
+          faces = phase.after
+        }
       }
       const entry = {
         number: steps.length + 1,
@@ -156,12 +178,12 @@ export const buildTimeline = model => {
         phases,
         start: swap ? shown : start,
         marks: swap ? [] : marks,
-        after: scene(faces, part.tone),
+        after: [...scene(faces, part.tone), ...doodles],
       }
       steps.push(entry)
       section.steps.push(entry)
     })
-    finals[part.id] = scene(faces, part.tone)
+    finals[part.id] = [...scene(faces, part.tone), ...doodles]
     shown = finals[part.id]
     section.preview = shown
     sections.push(section)
