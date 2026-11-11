@@ -455,6 +455,7 @@ body:has(.pad) {
 .piece svg {
   display: block;
   width: 100%;
+  pointer-events: none;
   aspect-ratio: 1;
   overflow: visible;
   transform: rotate(-4deg);
