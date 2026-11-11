@@ -115,5 +115,23 @@
       "y": 1280,
       "tilt": -2
     }
+  },
+  "leaf": {
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 1000,
+      "y": 730,
+      "tilt": 3
+    }
+  },
+  "stem": {
+    "minutes": 3,
+    "tools": ["none"],
+    "place": {
+      "x": 1120,
+      "y": 740,
+      "tilt": -2
+    }
   }
 }
