@@ -61,5 +61,32 @@
       "y": 538,
       "tilt": -4
     }
+  },
+  "watermelon": {
+    "minutes": 3,
+    "tools": ["pen"],
+    "place": {
+      "x": 1400,
+      "y": 90,
+      "tilt": -3
+    }
+  },
+  "onigiri": {
+    "minutes": 4,
+    "tools": ["glue"],
+    "place": {
+      "x": 1730,
+      "y": 70,
+      "tilt": 4
+    }
+  },
+  "carrot": {
+    "minutes": 4,
+    "tools": ["pen", "glue"],
+    "place": {
+      "x": 2060,
+      "y": 90,
+      "tilt": -2
+    }
   }
 }
