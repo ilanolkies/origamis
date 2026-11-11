@@ -1,0 +1,441 @@
+:root {
+  --paper: #fbf7ec;
+  --sheet: #fffdf6;
+  --ink: #1d1b22;
+  --soft: #6b6672;
+  --pink: #f0608d;
+  --green: #4fae76;
+  --blue: #4f9fe6;
+  --grid: rgb(79 159 230 / 0.16);
+  --stamp: #e23b4a;
+  --scribble: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  --scribble-flip: 18px 225px 18px 255px / 255px 18px 225px 18px;
+  --display: 'Dela Gothic One', 'Hiragino Kaku Gothic ProN', 'Arial Black', sans-serif;
+  --marker: 'Yusei Magic', 'Hiragino Maru Gothic ProN', 'Comic Sans MS', sans-serif;
+  --hand: 'Patrick Hand', 'Comic Sans MS', 'Hiragino Maru Gothic ProN', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  font: 400 18px/1.35 var(--hand);
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  padding: 18px 28px 6px;
+}
+
+h1 {
+  margin: 0;
+  font: 400 clamp(1.6rem, 3.2vw, 2.4rem) / 1 var(--display);
+  letter-spacing: 0.02em;
+  transform: rotate(-1.2deg);
+}
+
+h1 span {
+  color: var(--pink);
+  -webkit-text-stroke: 1.5px var(--ink);
+  paint-order: stroke fill;
+}
+
+.model {
+  margin: 0;
+  font: 400 1.25rem var(--marker);
+  padding: 2px 14px;
+  border: 2.5px solid var(--ink);
+  border-radius: var(--scribble);
+  background: var(--sheet);
+  transform: rotate(1.5deg);
+}
+
+.model span {
+  color: var(--green);
+}
+
+main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 28px;
+  padding: 12px 28px 26px;
+}
+
+.board {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.frame {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+  border: 3.5px solid var(--ink);
+  border-radius: var(--scribble);
+  background: var(--sheet);
+  box-shadow: 7px 8px 0 var(--ink);
+  overflow: hidden;
+}
+
+.frame::before,
+.frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.frame::before {
+  background: radial-gradient(circle, rgb(240 96 141 / 0.5) 1.7px, transparent 2.1px) 0 0 / 13px 13px;
+  mask-image: linear-gradient(135deg, #000, transparent 42%);
+}
+
+.frame::after {
+  background: radial-gradient(circle, rgb(79 159 230 / 0.45) 1.5px, transparent 1.9px) 0 0 / 11px 11px;
+  mask-image: linear-gradient(315deg, #000, transparent 34%);
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ink,
+.crease,
+.guide {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ink {
+  stroke: var(--ink);
+  stroke-width: 1.6;
+}
+
+.crease {
+  stroke: var(--ink);
+  stroke-width: 1.8;
+}
+
+.crease.valley {
+  stroke-dasharray: 8 7;
+}
+
+.crease.mountain {
+  stroke-dasharray: 13 6 2 6 2 6;
+}
+
+.guide {
+  stroke: var(--blue);
+  stroke-width: 3.2;
+}
+
+.hatch {
+  stroke: rgb(29 27 34 / 0.2);
+  stroke-width: 0.007;
+}
+
+.ground,
+.cast {
+  fill: var(--ink);
+  filter: url(#soft);
+}
+
+.ground {
+  opacity: 0.2;
+}
+
+#sfx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shout {
+  position: absolute;
+  font: 400 clamp(2.2rem, 6vw, 4.6rem) / 1 var(--display);
+  color: var(--ink);
+  -webkit-text-stroke: 7px var(--sheet);
+  paint-order: stroke fill;
+  white-space: nowrap;
+  animation: shout 950ms cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+
+@keyframes shout {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--turn)) scale(0.3);
+  }
+  25% {
+    opacity: 1;
+    transform: rotate(var(--turn)) scale(1.12);
+  }
+  70% {
+    opacity: 1;
+    transform: rotate(var(--turn)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--turn)) scale(1.05) translateY(-12px);
+  }
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.turn {
+  width: 64px;
+  height: 64px;
+  font-size: 1.5rem;
+  color: var(--ink);
+  background: var(--sheet);
+  border: 3px solid var(--ink);
+  border-radius: var(--scribble-flip);
+  box-shadow: 4px 5px 0 var(--ink);
+  cursor: pointer;
+  transition: transform 120ms, box-shadow 120ms, background 120ms;
+}
+
+.turn:hover:not(:disabled) {
+  background: var(--pink);
+  transform: translate(-1px, -2px) rotate(-3deg);
+  box-shadow: 6px 8px 0 var(--ink);
+}
+
+.turn:active:not(:disabled) {
+  transform: translate(3px, 4px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.turn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.turn:focus-visible,
+.step:focus-visible {
+  outline: 3px dashed var(--blue);
+  outline-offset: 3px;
+}
+
+.bubble {
+  min-height: 86px;
+  padding: 10px 20px 12px;
+  background: var(--sheet);
+  border: 3px solid var(--ink);
+  border-radius: var(--scribble);
+}
+
+#count {
+  font: 400 0.95rem var(--display);
+  color: var(--pink);
+  letter-spacing: 0.04em;
+}
+
+#caption {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+  text-wrap: pretty;
+}
+
+#steps {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 4px 10px 10px 4px;
+}
+
+.part header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 54px;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--ink);
+  border-radius: 0 0 40px 6px / 0 0 6px 3px;
+}
+
+.kanji {
+  display: grid;
+  place-items: center;
+  min-width: 46px;
+  height: 46px;
+  padding: 0 8px;
+  white-space: nowrap;
+  font: 400 1.35rem var(--marker);
+  background: var(--sheet);
+  border: 2.5px solid var(--ink);
+  border-radius: var(--scribble-flip);
+  transform: rotate(-4deg);
+}
+
+.part h2 {
+  margin: 0;
+  font: 400 1.35rem / 1.1 var(--marker);
+}
+
+.part header p {
+  margin: 0;
+  color: var(--soft);
+  font-size: 0.95rem;
+}
+
+.thumb {
+  width: 54px;
+  height: 54px;
+}
+
+.thumb polygon {
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.part ol {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 40px 9px 10px;
+  text-align: left;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.3;
+  background: transparent;
+  border: 2.5px solid transparent;
+  border-radius: var(--scribble);
+  cursor: pointer;
+  transition: transform 120ms, background 120ms;
+}
+
+.step:hover {
+  border-color: var(--ink);
+  background: var(--sheet);
+  transform: rotate(-0.6deg);
+}
+
+.step .number {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  font: 400 1rem var(--marker);
+  border: 2.5px solid var(--ink);
+  border-radius: 50% 46% 52% 44% / 46% 52% 44% 50%;
+  background: var(--sheet);
+}
+
+.step.current {
+  border-color: var(--ink);
+  background: linear-gradient(100deg, transparent 2%, rgb(240 96 141 / 0.3) 4%, rgb(240 96 141 / 0.22) 96%, transparent 98%),
+    var(--sheet);
+  box-shadow: 4px 5px 0 var(--ink);
+}
+
+.step.current .number {
+  background: var(--pink);
+}
+
+.step.done .text {
+  color: var(--soft);
+}
+
+.stamp {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  display: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font: 400 0.85rem var(--marker);
+  color: var(--stamp);
+  border: 2px solid var(--stamp);
+  border-radius: 50%;
+  transform: translateY(-50%) rotate(-12deg);
+}
+
+.step.done .stamp {
+  display: grid;
+}
+
+@media (max-width: 860px) {
+  html,
+  body {
+    height: auto;
+  }
+
+  main {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 10px 16px 24px;
+  }
+
+  .masthead {
+    padding: 14px 16px 4px;
+  }
+
+  .frame {
+    flex: none;
+    aspect-ratio: 1;
+  }
+
+  #steps {
+    overflow: visible;
+  }
+
+  .turn {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shout {
+    animation-duration: 1ms;
+  }
+}
