@@ -96,33 +96,51 @@ const pierces = (poly, start, end) => {
   return (t1 - t0) * length(sub(end, start)) > 1e-5
 }
 
+export const flatten = face => face.poly.map(p => apply(invert(face.matrix), p))
+
+export const seams = (a, b) =>
+  a.flatMap((p0, i) => {
+    const d = sub(a[(i + 1) % a.length], p0)
+    const size = length(d)
+    return b.flatMap((c0, k) => {
+      const c1 = b[(k + 1) % b.length]
+      if (Math.abs(cross(d, sub(c0, p0))) / size > 1e-7) return []
+      if (Math.abs(cross(d, sub(c1, p0))) / size > 1e-7) return []
+      const ta = dot(d, sub(c0, p0)) / (size * size)
+      const tb = dot(d, sub(c1, p0)) / (size * size)
+      const low = Math.max(0, Math.min(ta, tb))
+      const high = Math.min(1, Math.max(ta, tb))
+      if ((high - low) * size < 1e-7) return []
+      return [[add(p0, scale(d, low)), add(p0, scale(d, high))]]
+    })
+  })
+
+export const contains = (poly, point) => {
+  const ring = counterClockwise(poly)
+  return ring.every((a, i) => cross(unit(sub(ring[(i + 1) % ring.length], a)), sub(point, a)) > -1e-7)
+}
+
+export const overlaps = (a, b) => {
+  const ring = counterClockwise(b)
+  let piece = a
+  for (let i = 0; piece && i < ring.length; i++) piece = clip(piece, ring[i], ring[(i + 1) % ring.length], 1)
+  return Boolean(piece)
+}
+
 export const check = (faces, sheetArea) => {
-  const flat = faces.map(face => face.poly.map(p => apply(invert(face.matrix), p)))
+  const flat = faces.map(flatten)
   const creases = []
   let tears = 0
   for (let i = 0; i < faces.length; i++) {
     for (let j = i + 1; j < faces.length; j++) {
-      flat[i].forEach((p0, a) => {
-        const d = sub(flat[i][(a + 1) % flat[i].length], p0)
-        const size = length(d)
-        flat[j].forEach((c0, b) => {
-          const c1 = flat[j][(b + 1) % flat[j].length]
-          if (Math.abs(cross(d, sub(c0, p0))) / size > 1e-7) return
-          if (Math.abs(cross(d, sub(c1, p0))) / size > 1e-7) return
-          const ta = dot(d, sub(c0, p0)) / (size * size)
-          const tb = dot(d, sub(c1, p0)) / (size * size)
-          const low = Math.max(0, Math.min(ta, tb))
-          const high = Math.min(1, Math.max(ta, tb))
-          if ((high - low) * size < 1e-7) return
-          const ends = [add(p0, scale(d, low)), add(p0, scale(d, high))]
-          const onI = ends.map(p => apply(faces[i].matrix, p))
-          const onJ = ends.map(p => apply(faces[j].matrix, p))
-          if (onI.some((p, k) => length(sub(p, onJ[k])) > 1e-7)) tears++
-          else if (faces[i].matrix.some((v, k) => Math.abs(v - faces[j].matrix[k]) > 1e-7)) {
-            creases.push({ i, j, start: onI[0], end: onI[1] })
-          }
-        })
-      })
+      for (const ends of seams(flat[i], flat[j])) {
+        const onI = ends.map(p => apply(faces[i].matrix, p))
+        const onJ = ends.map(p => apply(faces[j].matrix, p))
+        if (onI.some((p, k) => length(sub(p, onJ[k])) > 1e-7)) tears++
+        else if (faces[i].matrix.some((v, k) => Math.abs(v - faces[j].matrix[k]) > 1e-7)) {
+          creases.push({ i, j, start: onI[0], end: onI[1] })
+        }
+      }
     }
   }
   let pierced = 0

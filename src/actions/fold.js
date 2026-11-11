@@ -3,15 +3,19 @@ import {
   apply,
   clip,
   compose,
+  contains,
   creaseSegment,
   cross,
   det,
   dot,
+  flatten,
   invert,
   length,
   lerp,
+  overlaps,
   reflection,
   scale,
+  seams,
   sub,
   unit,
 } from '../geometry.js'
@@ -21,17 +25,56 @@ const CAMERA_HEIGHT = 5
 const LIGHT = [0.22, -0.28]
 const SOUNDS = ['パタッ', 'ペタッ', 'スッ', 'キュッ']
 
-export const fold = (faces, { from, to, mover, kind }) => {
+const LAYERED = 4
+const PROBE = 1e-3
+
+const lifted = (faces, { from, to, mover, layers }, sign, mirror) => {
+  const all = faces.map((_, i) => i)
+  if (layers === undefined) return new Set(all)
+  const parts = faces.map(face => clip(face.poly, from, to, sign))
+  const flat = faces.map(flatten)
+  const below = layers === 'bottom'
+  const probe = lerp(mover, apply(mirror, mover), PROBE)
+  const under = all.filter(i => parts[i] && contains(faces[i].poly, probe))
+  const reached = under.length ? under : all.filter(i => parts[i])
+  const order = below ? reached : [...reached].reverse()
+  const picked = new Set(order.slice(0, typeof layers === 'number' ? layers : 1))
+  const across = p => sign * cross(sub(to, from), sub(p, from)) > 1e-7
+  const joined = (i, j) =>
+    seams(flat[i], flat[j]).some(seam => seam.some(p => across(apply(faces[i].matrix, p))))
+  const covers = (i, j) => (below ? j < i : j > i) && parts[i] && parts[j] && overlaps(parts[i], parts[j])
+  let grown = true
+  while (grown) {
+    grown = false
+    for (const i of picked) {
+      for (const j of all) {
+        if (!picked.has(j) && (joined(i, j) || covers(i, j))) {
+          picked.add(j)
+          grown = true
+        }
+      }
+    }
+  }
+  return picked
+}
+
+export const fold = (faces, crease) => {
+  const { from, to, mover, kind } = crease
   const sign = cross(sub(to, from), sub(mover, from)) > 0 ? 1 : -1
   const mirror = reflection(from, to)
+  const picked = lifted(faces, crease, sign, mirror)
   const stays = []
   const moving = []
-  for (const face of faces) {
+  faces.forEach((face, i) => {
+    if (!picked.has(i)) {
+      stays.push(face)
+      return
+    }
     const stay = clip(face.poly, from, to, -sign)
     const move = clip(face.poly, from, to, sign)
     if (stay) stays.push({ ...face, poly: stay })
     if (move) moving.push({ ...face, poly: move })
-  }
+  })
   const landed = moving
     .map(face => ({
       poly: face.poly.map(p => apply(mirror, p)),
@@ -39,7 +82,12 @@ export const fold = (faces, { from, to, mover, kind }) => {
       colorUp: !face.colorUp,
     }))
     .reverse()
-  return { faces: kind === 'valley' ? [...stays, ...landed] : [...landed, ...stays], stays, moving }
+  return {
+    faces: kind === 'valley' ? [...stays, ...landed] : [...landed, ...stays],
+    stays,
+    moving,
+    layers: faces.filter((_, i) => picked.has(i)),
+  }
 }
 
 const swingPhase = (before, crease, paper) => {
@@ -49,7 +97,7 @@ const swingPhase = (before, crease, paper) => {
   const viewTo = fitView(result.faces)
   const eye = lerp(viewFrom.center, viewTo.center, 0.5)
   const lift = crease.kind === 'valley' ? 1 : -1
-  const [lineFrom, lineTo] = creaseSegment(before, crease.from, crease.to)
+  const [lineFrom, lineTo] = creaseSegment(result.layers, crease.from, crease.to)
   const stays = scene(result.stays, paper)
 
   const swing = (p, angle) => {
@@ -95,7 +143,7 @@ const swingPhase = (before, crease, paper) => {
 }
 
 const foldMarks = (paper, action) => {
-  const [from, to] = creaseSegment(paper.faces, action.from, action.to)
+  const [from, to] = creaseSegment(fold(paper.faces, action).layers, action.from, action.to)
   const target = apply(reflection(action.from, action.to), action.mover)
   const reach = length(sub(target, action.mover))
   const control = add(
@@ -115,8 +163,8 @@ const performFold = (paper, action) => {
 }
 
 const scored = (faces, crease) =>
-  faces
-    .filter(face => clip(face.poly, crease.from, crease.to, 1) && clip(face.poly, crease.from, crease.to, -1))
+  fold(faces, crease)
+    .layers.filter(face => clip(face.poly, crease.from, crease.to, 1) && clip(face.poly, crease.from, crease.to, -1))
     .map(face => {
       const back = invert(face.matrix)
       const [from, to] = creaseSegment([face], crease.from, crease.to).map(p => apply(back, p))
@@ -152,7 +200,9 @@ export const moveFolds = (folds = [], m, moveFaces) =>
     },
   }))
 
-const folding = { level: 0, perform: performFold, marks: foldMarks }
+const layered = base => action => (action.layers === undefined ? base : Math.max(base, LAYERED))
+
+const folding = { level: layered(0), perform: performFold, marks: foldMarks }
 
 export const valley = folding
 export const mountain = folding
@@ -160,7 +210,7 @@ export const mountain = folding
 export const unfold = { level: 3, perform: performUnfold, marks: unfoldMarks }
 
 export const crease = {
-  level: 3,
+  level: layered(3),
   perform: (paper, action) => {
     const folded = performFold(paper, { ...action, kind: action.fold ?? 'valley' })
     const opened = performUnfold(folded.paper)
