@@ -17,28 +17,6 @@ const number = v => v.toFixed(4)
 const spot = p => `${number(p[0])} ${number(-p[1])}`
 const spots = poly => poly.map(p => `${number(p[0])},${number(-p[1])}`).join(' ')
 
-const noise = n => {
-  const s = Math.sin(n * 127.1 + 311.7) * 43758.5453
-  return (s - Math.floor(s)) * 2 - 1
-}
-
-const scribble = (a, b, seed, wobble) => {
-  const span = Math.hypot(b[0] - a[0], b[1] - a[1])
-  if (span < 1e-5) return ''
-  const along = [(b[0] - a[0]) / span, (b[1] - a[1]) / span]
-  const across = [-along[1], along[0]]
-  const over = Math.min(wobble * 2, span * 0.08)
-  const shifted = (p, forward, sideways) => [
-    p[0] + along[0] * forward + across[0] * sideways,
-    p[1] + along[1] * forward + across[1] * sideways,
-  ]
-  const start = shifted(a, -over * (0.5 + 0.5 * noise(seed)), wobble * noise(seed + 1))
-  const end = shifted(b, over * (0.5 + 0.5 * noise(seed + 2)), wobble * noise(seed + 3))
-  const middle = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
-  const control = shifted(middle, span * 0.2 * noise(seed + 4), wobble * 1.6 * noise(seed + 5))
-  return `M${spot(start)}Q${spot(control)} ${spot(end)}`
-}
-
 export const cameraOf = ({ yaw, pitch, target, radius }) => {
   const distance = radius * REACH
   const away = [Math.cos(pitch) * Math.cos(yaw), Math.cos(pitch) * Math.sin(yaw), Math.sin(pitch)]
@@ -222,8 +200,7 @@ const table = camera => {
   return `<polygon class="table" points="${spots(ahead(rim, camera, true).map(camera.project))}"/><path class="rule" d="${lines}"/>`
 }
 
-export const renderPose = (pose, mesh, camera, seed) => {
-  const wobble = 0.005
+export const renderPose = (pose, mesh, camera) => {
   const sheets = pose.faces.map(({ points, normal }, face) => {
     const flat = normalOf(points)
     return shapeOf(points, dot3(flat, normal) < 0 ? scale3(flat, -1) : flat, camera, { face })
@@ -235,7 +212,7 @@ export const renderPose = (pose, mesh, camera, seed) => {
     .join('')
   const body = painted(shapes)
     .map(shape => {
-      const lit = 0.7 + 0.3 * Math.abs(dot3(shape.toEye, LIGHT))
+      const lit = 0.58 + 0.42 * Math.abs(dot3(shape.toEye, LIGHT))
       const seesUp = shape.spine ? shape.seesFront === shape.upOutside : shape.seesFront
       const fill = `rgb(${(seesUp ? PAPER : COLOUR).map(v => Math.round(v * lit)).join(' ')})`
       const ink = shape.spine ? '' : shape.screen
@@ -243,8 +220,7 @@ export const renderPose = (pose, mesh, camera, seed) => {
           const hinge = mesh.edges[shape.face][i]
           if (hinge >= 0 && Math.abs(pose.phi[hinge]) < INKED) return ''
           const q = shape.screen[(i + 1) % shape.screen.length]
-          const key = seed * 13.7 + shape.face * 31.1 + i * 7.3
-          return scribble(p, q, key, wobble) + scribble(p, q, key + 100, wobble)
+          return `M${spot(p)}L${spot(q)}`
         })
         .join('')
       return `<polygon points="${spots(shape.screen)}" fill="${fill}" stroke="${fill}" stroke-width="0.004"/><path class="ink" d="${ink}"/>`

@@ -6,7 +6,6 @@ import { add3, scale3, sub3 } from './vec.js'
 
 const SECONDS = 1.5
 const PAUSE = 0.55
-const BOIL = 140
 const DOWN = (62 * Math.PI) / 180
 const LEVEL = (16 * Math.PI) / 180
 const YAW = (-62 * Math.PI) / 180
@@ -66,7 +65,7 @@ const frame = (pose, now) => {
     target: lens.target,
     radius: lens.radius,
   })
-  stage.innerHTML = renderPose(pose, model.mesh, camera, Math.floor(now / BOIL) % 5)
+  stage.innerHTML = renderPose(pose, model.mesh, camera)
 }
 
 let before = performance.now()

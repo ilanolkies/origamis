@@ -1,7 +1,7 @@
 import { add, apply, area, clip, compose, contains, counterClockwise, cross, det, dot, flatten, invert, length, overlaps, scale, sub, unit } from '../../src/geometry.js'
 import { add3, lerp3, length3, mulMat, mulVec, rotation, scale3, sub3, turnBetween } from './vec.js'
 
-export const THICKNESS = 0.003
+export const THICKNESS = 0.0015
 const GRID = 1e6
 const RELAX_ROUNDS = 14
 const NUDGE = 0.02

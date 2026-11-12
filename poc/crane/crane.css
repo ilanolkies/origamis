@@ -43,7 +43,8 @@
 .crane3d .ink {
   fill: none;
   stroke: var(--ink);
-  stroke-width: 1.7;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
   stroke-linecap: round;
 }
 
