@@ -1,23 +1,41 @@
 import { add3, cross3, dot3, scale3, sub3, unit3 } from './vec.js'
-import { THICKNESS } from './fold3d.js'
 
-const PAPER = [255, 253, 246]
-const COLOUR = [228, 92, 64]
+const PAPER = [1, 0.992, 0.965]
+const COLOUR = [0.894, 0.361, 0.251]
+const INK = [0.114, 0.106, 0.133, 1]
+const SHEET = [1, 0.992, 0.965, 1]
+const RULE_INK = [0.31, 0.624, 0.902, 0.16]
+const SHADE = [0.114, 0.106, 0.133, 0.16]
 const LIGHT = unit3([-0.35, 0.3, -1])
 const REACH = 3.3
 const FILL = 0.92
 const INKED = 0.3
 const TABLE = 2.3
 const RULE = 0.23
-const SLACK = THICKNESS * 0.3
-const NEAR = 0.15
-const CREASED = 0.05
+const NEAR = 0.2
+const FAR = 40
+const WIDE = 1.25
+const OUTLINE = 2.4
+const HAIR = 1
+const PULL = 0.0015
 
-const number = v => v.toFixed(4)
-const spot = p => `${number(p[0])} ${number(-p[1])}`
-const spots = poly => poly.map(p => `${number(p[0])},${number(-p[1])}`).join(' ')
+const VERTEX = 'attribute vec4 place; attribute vec4 tint; varying vec4 shade; void main() { shade = tint; gl_Position = place; }'
+const FRAGMENT = 'precision mediump float; varying vec4 shade; void main() { gl_FragColor = shade; }'
 
-export const cameraOf = ({ yaw, pitch, target, radius }) => {
+const programOf = gl => {
+  const program = gl.createProgram()
+  for (const [kind, source] of [[gl.VERTEX_SHADER, VERTEX], [gl.FRAGMENT_SHADER, FRAGMENT]]) {
+    const shader = gl.createShader(kind)
+    gl.shaderSource(shader, source)
+    gl.compileShader(shader)
+    gl.attachShader(program, shader)
+  }
+  gl.linkProgram(program)
+  gl.useProgram(program)
+  return program
+}
+
+const cameraOf = ({ yaw, pitch, target, radius }, width, height) => {
   const distance = radius * REACH
   const away = [Math.cos(pitch) * Math.cos(yaw), Math.cos(pitch) * Math.sin(yaw), Math.sin(pitch)]
   const eye = add3(target, scale3(away, distance))
@@ -25,206 +43,119 @@ export const cameraOf = ({ yaw, pitch, target, radius }) => {
   const right = unit3(cross3(forward, [0, 0, 1]))
   const up = cross3(right, forward)
   const focal = (FILL * distance) / radius
-  const project = p => {
+  const unitPixels = Math.min(width / (2 * WIDE), height / 2)
+  const zoom = [(focal * unitPixels * 2) / width, (focal * unitPixels * 2) / height]
+  const clip = p => {
     const d = sub3(p, eye)
     const depth = dot3(d, forward)
-    return [(focal * dot3(d, right)) / depth, (focal * dot3(d, up)) / depth, depth]
+    return [
+      zoom[0] * dot3(d, right),
+      zoom[1] * dot3(d, up),
+      ((FAR + NEAR) * depth - 2 * FAR * NEAR) / (FAR - NEAR),
+      depth,
+    ]
   }
-  const depthOf = p => dot3(sub3(p, eye), forward)
-  return { eye, project, depthOf }
-}
-
-const ahead = (points, camera, closed) => {
-  const out = []
-  points.forEach((p, i) => {
-    if (!closed && i === points.length - 1) {
-      if (camera.depthOf(p) >= NEAR) out.push(p)
-      return
-    }
-    const q = points[(i + 1) % points.length]
-    const dp = camera.depthOf(p) - NEAR
-    const dq = camera.depthOf(q) - NEAR
-    if (dp >= 0) out.push(p)
-    if (dp * dq < 0) out.push(add3(p, scale3(sub3(q, p), dp / (dp - dq))))
-  })
-  return out
-}
-
-const normalOf = points => {
-  let n = [0, 0, 0]
-  points.forEach((p, i) => {
-    const q = points[(i + 1) % points.length]
-    n = add3(n, [(p[1] - q[1]) * (p[2] + q[2]), (p[2] - q[2]) * (p[0] + q[0]), (p[0] - q[0]) * (p[1] + q[1])])
-  })
-  return unit3(n)
+  return { eye, clip, forward }
 }
 
 const centreOf = points => scale3(points.reduce(add3, [0, 0, 0]), 1 / points.length)
 
-const apart = (a, b) => {
-  for (const ring of [a, b]) {
-    for (let i = 0; i < ring.length; i++) {
-      const p = ring[i]
-      const q = ring[(i + 1) % ring.length]
-      const nx = q[1] - p[1]
-      const ny = p[0] - q[0]
-      const size = Math.hypot(nx, ny) || 1
-      let lowA = Infinity
-      let highA = -Infinity
-      let lowB = Infinity
-      let highB = -Infinity
-      for (const v of a) {
-        const d = (v[0] * nx + v[1] * ny) / size
-        lowA = Math.min(lowA, d)
-        highA = Math.max(highA, d)
-      }
-      for (const v of b) {
-        const d = (v[0] * nx + v[1] * ny) / size
-        lowB = Math.min(lowB, d)
-        highB = Math.max(highB, d)
-      }
-      if (highA - lowB < 2e-3 || highB - lowA < 2e-3) return true
+export const createView = canvas => {
+  const gl = canvas.getContext('webgl', { stencil: true, antialias: true, premultipliedAlpha: false })
+  const program = programOf(gl)
+  const buffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+  for (const [name, offset] of [['place', 0], ['tint', 16]]) {
+    const slot = gl.getAttribLocation(program, name)
+    gl.enableVertexAttribArray(slot)
+    gl.vertexAttribPointer(slot, 4, gl.FLOAT, false, 32, offset)
+  }
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+  gl.enable(gl.BLEND)
+  gl.polygonOffset(1, 1)
+
+  const flush = data => {
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW)
+    gl.drawArrays(gl.TRIANGLES, 0, data.length / 8)
+  }
+
+  return (pose, mesh, lens) => {
+    const ratio = window.devicePixelRatio || 1
+    const width = Math.round(canvas.clientWidth * ratio)
+    const height = Math.round(canvas.clientHeight * ratio)
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width
+      canvas.height = height
     }
-  }
-  return false
-}
+    gl.viewport(0, 0, width, height)
+    const camera = cameraOf(lens, width, height)
 
-const sideOf = (points, plane) => {
-  let front = 0
-  let back = 0
-  for (const p of points) {
-    const d = dot3(sub3(p, plane.centre), plane.toEye)
-    if (d > SLACK) front++
-    else if (d < -SLACK) back++
-  }
-  if (front && !back) return 1
-  if (back && !front) return -1
-  return 0
-}
-
-const inFront = (a, b) => -sideOf(b.points, a) || sideOf(a.points, b) || Math.sign(b.depth - a.depth)
-
-const painted = shapes => {
-  const count = shapes.length
-  const above = shapes.map(() => [])
-  const waiting = shapes.map(() => 0)
-  for (let i = 0; i < count; i++) {
-    for (let j = i + 1; j < count; j++) {
-      const a = shapes[i]
-      const b = shapes[j]
-      if (a.box[0] > b.box[2] || b.box[0] > a.box[2] || a.box[1] > b.box[3] || b.box[1] > a.box[3]) continue
-      if (apart(a.screen, b.screen)) continue
-      const order = inFront(a, b)
-      if (order > 0) {
-        above[j].push(i)
-        waiting[i]++
-      } else if (order < 0) {
-        above[i].push(j)
-        waiting[j]++
-      }
+    const fan = (data, points, tint) => {
+      const placed = points.map(camera.clip)
+      for (let i = 1; i < placed.length - 1; i++) data.push(...placed[0], ...tint, ...placed[i], ...tint, ...placed[i + 1], ...tint)
     }
-  }
-  const left = new Set(shapes.map((_, i) => i))
-  const out = []
-  while (left.size) {
-    let pick = -1
-    let stuck = -1
-    for (const i of left) {
-      if (stuck < 0 || shapes[i].depth > shapes[stuck].depth) stuck = i
-      if (waiting[i] === 0 && (pick < 0 || shapes[i].depth > shapes[pick].depth)) pick = i
+    const line = (data, from, to, tint, thick) => {
+      let a = from
+      let b = to
+      const da = dot3(sub3(a, camera.eye), camera.forward) - NEAR
+      const db = dot3(sub3(b, camera.eye), camera.forward) - NEAR
+      if (da < 0 && db < 0) return
+      if (da < 0) a = add3(a, scale3(sub3(b, a), da / (da - db)))
+      if (db < 0) b = add3(b, scale3(sub3(a, b), db / (db - da)))
+      const [p, q] = [a, b].map(point => {
+        const [x, y, z, w] = camera.clip(point)
+        return [x / w, y / w, z / w - PULL / w]
+      })
+      const along = [(q[0] - p[0]) * width, (q[1] - p[1]) * height]
+      const size = Math.hypot(...along) || 1
+      const side = [(-along[1] / size) * ((thick * ratio) / width), (along[0] / size) * ((thick * ratio) / height)]
+      const corner = (point, way) => [point[0] + side[0] * way, point[1] + side[1] * way, point[2], 1, ...tint]
+      data.push(...corner(p, 1), ...corner(p, -1), ...corner(q, 1), ...corner(q, 1), ...corner(p, -1), ...corner(q, -1))
     }
-    const next = pick < 0 ? stuck : pick
-    left.delete(next)
-    out.push(shapes[next])
-    for (const other of above[next]) waiting[other]--
-  }
-  return out
-}
 
-const shapeOf = (points, facing, camera, extra) => {
-  const centre = centreOf(points)
-  const seesFront = dot3(facing, sub3(camera.eye, centre)) > 0
-  const screen = points.map(camera.project)
-  const xs = screen.map(p => p[0])
-  const ys = screen.map(p => p[1])
-  return {
-    ...extra,
-    points,
-    centre,
-    seesFront,
-    toEye: seesFront ? facing : scale3(facing, -1),
-    screen,
-    depth: camera.project(centre)[2],
-    box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)],
-  }
-}
+    gl.clearColor(0, 0, 0, 0)
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT)
+    gl.disable(gl.DEPTH_TEST)
+    gl.disable(gl.STENCIL_TEST)
 
-const spinesOf = (pose, mesh, camera) => {
-  const sides = new Map()
-  mesh.edges.forEach((edges, face) =>
-    edges.forEach((hinge, i) => {
-      if (hinge >= 0 && Math.abs(pose.phi[hinge]) > CREASED) sides.set(hinge, [...(sides.get(hinge) ?? []), { face, i }])
-    }),
-  )
-  return [...sides.values()].flatMap(([one, other]) => {
-    const near = pose.faces[one.face].points
-    const far = pose.faces[other.face].points
-    const points = [near[one.i], near[(one.i + 1) % near.length], far[other.i], far[(other.i + 1) % far.length]]
-    const gap = sub3(points[3], points[0])
-    if (Math.hypot(...gap) < 1e-5) return []
-    const middle = centreOf(points)
-    const inside = scale3(add3(centreOf(near), centreOf(far)), 0.5)
-    const out = sub3(middle, inside)
-    const flat = normalOf(points)
-    const facing = dot3(flat, out) < 0 ? scale3(flat, -1) : flat
-    const upOutside = dot3(pose.faces[one.face].normal, sub3(centreOf(near), centreOf(far))) > 0
-    return [shapeOf(points, facing, camera, { spine: true, upOutside })]
-  })
-}
-
-const table = camera => {
-  const rim = Array.from({ length: 48 }, (_, i) => {
-    const angle = (i / 48) * 2 * Math.PI
-    return [TABLE * Math.cos(angle), TABLE * Math.sin(angle), 0]
-  })
-  const rules = []
-  for (let offset = -TABLE + RULE / 2; offset < TABLE; offset += RULE) {
-    const reach = Math.sqrt(TABLE * TABLE - offset * offset)
-    rules.push([[offset, -reach, 0], [offset, reach, 0]], [[-reach, offset, 0], [reach, offset, 0]])
-  }
-  const lines = rules
-    .map(rule => ahead(rule, camera, false))
-    .filter(rule => rule.length === 2)
-    .map(([a, b]) => `M${spot(camera.project(a))}L${spot(camera.project(b))}`)
-    .join('')
-  return `<polygon class="table" points="${spots(ahead(rim, camera, true).map(camera.project))}"/><path class="rule" d="${lines}"/>`
-}
-
-export const renderPose = (pose, mesh, camera) => {
-  const sheets = pose.faces.map(({ points, normal }, face) => {
-    const flat = normalOf(points)
-    return shapeOf(points, dot3(flat, normal) < 0 ? scale3(flat, -1) : flat, camera, { face })
-  })
-  const shapes = [...sheets, ...spinesOf(pose, mesh, camera)]
-  const cast = pose.faces
-    .map(({ points }) => spots(points.map(p => camera.project(sub3(p, scale3(LIGHT, p[2] / LIGHT[2]))))))
-    .map(points => `<polygon points="${points}"/>`)
-    .join('')
-  const body = painted(shapes)
-    .map(shape => {
-      const lit = 0.58 + 0.42 * Math.abs(dot3(shape.toEye, LIGHT))
-      const seesUp = shape.spine ? shape.seesFront === shape.upOutside : shape.seesFront
-      const fill = `rgb(${(seesUp ? PAPER : COLOUR).map(v => Math.round(v * lit)).join(' ')})`
-      const ink = shape.spine ? '' : shape.screen
-        .map((p, i) => {
-          const hinge = mesh.edges[shape.face][i]
-          if (hinge >= 0 && Math.abs(pose.phi[hinge]) < INKED) return ''
-          const q = shape.screen[(i + 1) % shape.screen.length]
-          return `M${spot(p)}L${spot(q)}`
-        })
-        .join('')
-      return `<polygon points="${spots(shape.screen)}" fill="${fill}" stroke="${fill}" stroke-width="0.004"/><path class="ink" d="${ink}"/>`
+    const rim = Array.from({ length: 64 }, (_, i) => {
+      const angle = (i / 64) * 2 * Math.PI
+      return [TABLE * Math.cos(angle), TABLE * Math.sin(angle), 0]
     })
-    .join('')
-  return `${table(camera)}<g class="cast">${cast}</g>${body}`
+    const floor = []
+    for (let i = 0; i < rim.length; i++) fan(floor, [[0, 0, 0], rim[i], rim[(i + 1) % rim.length]], SHEET)
+    for (let offset = -TABLE + RULE / 2; offset < TABLE; offset += RULE) {
+      const reach = Math.sqrt(TABLE * TABLE - offset * offset)
+      line(floor, [offset, -reach, 0], [offset, reach, 0], RULE_INK, HAIR)
+      line(floor, [-reach, offset, 0], [reach, offset, 0], RULE_INK, HAIR)
+    }
+    rim.forEach((point, i) => line(floor, point, rim[(i + 1) % rim.length], INK, OUTLINE))
+    flush(floor)
+
+    gl.enable(gl.STENCIL_TEST)
+    gl.stencilFunc(gl.NOTEQUAL, 1, 1)
+    gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE)
+    const cast = []
+    for (const { points } of pose.faces) fan(cast, points.map(p => sub3(p, scale3(LIGHT, p[2] / LIGHT[2]))), SHADE)
+    flush(cast)
+    gl.disable(gl.STENCIL_TEST)
+
+    gl.enable(gl.DEPTH_TEST)
+    gl.enable(gl.POLYGON_OFFSET_FILL)
+    const sheets = []
+    const edges = []
+    pose.faces.forEach(({ points, normal }, face) => {
+      const seesUp = dot3(normal, sub3(camera.eye, centreOf(points))) > 0
+      const lit = 0.6 + 0.4 * Math.abs(dot3(normal, LIGHT))
+      fan(sheets, points, [...(seesUp ? PAPER : COLOUR).map(value => value * lit), 1])
+      points.forEach((point, i) => {
+        const hinge = mesh.edges[face][i]
+        if (hinge >= 0 && Math.abs(pose.phi[hinge]) < INKED) return
+        line(edges, point, points[(i + 1) % points.length], INK, OUTLINE)
+      })
+    })
+    flush(sheets)
+    gl.disable(gl.POLYGON_OFFSET_FILL)
+    flush(edges)
+  }
 }

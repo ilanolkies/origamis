@@ -1,7 +1,7 @@
 import { crane, FINISH } from './crane.js'
 import { animator, build, opened } from './fold3d.js'
 import { statesOf } from './states.js'
-import { cameraOf, renderPose } from './view.js'
+import { createView } from './view.js'
 import { add3, scale3, sub3 } from './vec.js'
 
 const SECONDS = 1.5
@@ -22,6 +22,7 @@ const texts = ['A square of paper, white side up.', ...crane.steps.map(step => s
 const stops = [...texts.keys()].map(step => (step > crane.steps.length ? last : states.findLastIndex(state => state.step === step)))
 
 const stage = document.querySelector('#scene')
+const draw = createView(stage)
 const caption = document.querySelector('#caption')
 const count = document.querySelector('#count')
 const play = document.querySelector('#play')
@@ -50,7 +51,7 @@ const poseNow = () => {
   return poseAt(index, ease(show.at - index))
 }
 
-const frame = (pose, now) => {
+const frame = pose => {
   const all = pose.faces.flatMap(face => face.points)
   const low = all.reduce((a, p) => a.map((v, i) => Math.min(v, p[i])), [Infinity, Infinity, Infinity])
   const high = all.reduce((a, p) => a.map((v, i) => Math.max(v, p[i])), [-Infinity, -Infinity, -Infinity])
@@ -59,13 +60,12 @@ const frame = (pose, now) => {
   lens.target = add3(lens.target, scale3(sub3(centre, lens.target), 0.08))
   lens.radius += (radius - lens.radius) * 0.08
   const standing = ease(clamp(show.at - (last - 1), 0, 1))
-  const camera = cameraOf({
+  draw(pose, model.mesh, {
     yaw: YAW + show.yaw,
     pitch: clamp(DOWN + (LEVEL - DOWN) * standing + show.pitch, 0.06, 1.5),
     target: lens.target,
     radius: lens.radius,
   })
-  stage.innerHTML = renderPose(pose, model.mesh, camera)
 }
 
 let before = performance.now()
@@ -85,7 +85,7 @@ const tick = now => {
   }
   show.rest = show.held ? 0 : show.rest + elapsed
   if (show.at === last && show.rest > 1.5) show.yaw += SPIN * elapsed
-  frame(poseNow(), now)
+  frame(poseNow())
   requestAnimationFrame(tick)
 }
 
