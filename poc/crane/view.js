@@ -11,6 +11,7 @@ const TABLE = 2.3
 const RULE = 0.23
 const SLACK = THICKNESS * 0.3
 const NEAR = 0.15
+const CREASED = 0.05
 
 const number = v => v.toFixed(4)
 const spot = p => `${number(p[0])} ${number(-p[1])}`
@@ -162,6 +163,47 @@ const painted = shapes => {
   return out
 }
 
+const shapeOf = (points, facing, camera, extra) => {
+  const centre = centreOf(points)
+  const seesFront = dot3(facing, sub3(camera.eye, centre)) > 0
+  const screen = points.map(camera.project)
+  const xs = screen.map(p => p[0])
+  const ys = screen.map(p => p[1])
+  return {
+    ...extra,
+    points,
+    centre,
+    seesFront,
+    toEye: seesFront ? facing : scale3(facing, -1),
+    screen,
+    depth: camera.project(centre)[2],
+    box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)],
+  }
+}
+
+const spinesOf = (pose, mesh, camera) => {
+  const sides = new Map()
+  mesh.edges.forEach((edges, face) =>
+    edges.forEach((hinge, i) => {
+      if (hinge >= 0 && Math.abs(pose.phi[hinge]) > CREASED) sides.set(hinge, [...(sides.get(hinge) ?? []), { face, i }])
+    }),
+  )
+  return [...sides.values()].flatMap(([one, other]) => {
+    const near = pose.faces[one.face].points
+    const far = pose.faces[other.face].points
+    const points = [near[one.i], near[(one.i + 1) % near.length], far[other.i], far[(other.i + 1) % far.length]]
+    const gap = sub3(points[3], points[0])
+    if (Math.hypot(...gap) < 1e-5) return []
+    const middle = centreOf(points)
+    const inside = scale3(add3(centreOf(near), centreOf(far)), 0.5)
+    const out = sub3(middle, inside)
+    const flat = normalOf(points)
+    const facing = dot3(flat, out) < 0 ? scale3(flat, -1) : flat
+    const upOutside = dot3(pose.faces[one.face].normal, sub3(centreOf(near), centreOf(far))) > 0
+    return [shapeOf(points, facing, camera, { spine: true, upOutside })]
+  })
+}
+
 const table = camera => {
   const rim = Array.from({ length: 48 }, (_, i) => {
     const angle = (i / 48) * 2 * Math.PI
@@ -182,26 +224,11 @@ const table = camera => {
 
 export const renderPose = (pose, mesh, camera, seed) => {
   const wobble = 0.005
-  const shapes = pose.faces.map(({ points, normal }, face) => {
-    const centre = centreOf(points)
+  const sheets = pose.faces.map(({ points, normal }, face) => {
     const flat = normalOf(points)
-    const facing = dot3(flat, normal) < 0 ? scale3(flat, -1) : flat
-    const seesUp = dot3(facing, sub3(camera.eye, centre)) > 0
-    const toEye = seesUp ? facing : scale3(facing, -1)
-    const screen = points.map(camera.project)
-    const xs = screen.map(p => p[0])
-    const ys = screen.map(p => p[1])
-    return {
-      face,
-      points,
-      centre,
-      toEye,
-      seesUp,
-      screen,
-      depth: camera.project(centre)[2],
-      box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)],
-    }
+    return shapeOf(points, dot3(flat, normal) < 0 ? scale3(flat, -1) : flat, camera, { face })
   })
+  const shapes = [...sheets, ...spinesOf(pose, mesh, camera)]
   const cast = pose.faces
     .map(({ points }) => spots(points.map(p => camera.project(sub3(p, scale3(LIGHT, p[2] / LIGHT[2]))))))
     .map(points => `<polygon points="${points}"/>`)
@@ -209,8 +236,9 @@ export const renderPose = (pose, mesh, camera, seed) => {
   const body = painted(shapes)
     .map(shape => {
       const lit = 0.7 + 0.3 * Math.abs(dot3(shape.toEye, LIGHT))
-      const fill = `rgb(${(shape.seesUp ? PAPER : COLOUR).map(v => Math.round(v * lit)).join(' ')})`
-      const ink = shape.screen
+      const seesUp = shape.spine ? shape.seesFront === shape.upOutside : shape.seesFront
+      const fill = `rgb(${(seesUp ? PAPER : COLOUR).map(v => Math.round(v * lit)).join(' ')})`
+      const ink = shape.spine ? '' : shape.screen
         .map((p, i) => {
           const hinge = mesh.edges[shape.face][i]
           if (hinge >= 0 && Math.abs(pose.phi[hinge]) < INKED) return ''
