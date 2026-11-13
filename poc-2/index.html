@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Origami 3D · poc-2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1><a href="../">折り紙</a> 3D folds</h1>
+      <nav id="models" aria-label="Models"></nav>
+    </header>
+    <main id="stage" aria-label="Paper, drag to look around"></main>
+    <footer>
+      <p id="caption" aria-live="polite"></p>
+      <div class="controls">
+        <button id="previous" type="button" aria-label="Previous step">◀</button>
+        <button id="play" type="button">Play</button>
+        <button id="next" type="button" aria-label="Next step">▶</button>
+        <input id="scrub" type="range" min="0" step="0.001" aria-label="Fold progress" />
+      </div>
+    </footer>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
