@@ -39,12 +39,20 @@ body {
 }
 
 .masthead {
+  position: relative;
+  z-index: 4;
+  pointer-events: none;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 4px 24px;
   padding: 18px 28px 6px;
+}
+
+.masthead a,
+.masthead button {
+  pointer-events: auto;
 }
 
 h1 {
