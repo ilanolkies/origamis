@@ -20,6 +20,7 @@ const UNFOLD_MS = 2200
 const FOLD_UP_MS = 900
 const RETURN_MS = 700
 const SETTLE_MS = 400
+const PHONE_ZOOM = 0.4
 const COPIED_MS = 1800
 
 const root = document.documentElement
@@ -102,9 +103,10 @@ sketchpad.innerHTML = `
     ${pieces.map(card).join('')}
   </div>`
 
-sketchpad.scrollLeft = MARGIN - 20
-sketchpad.scrollTop = MARGIN - 20
-enableZoom(sketchpad, sketchpad.querySelector('.world'))
+const startZoom = matchMedia('(max-width: 860px)').matches ? PHONE_ZOOM : 1
+enableZoom(sketchpad, sketchpad.querySelector('.world'), startZoom)
+sketchpad.scrollLeft = (MARGIN - 20) * startZoom
+sketchpad.scrollTop = (MARGIN - 20) * startZoom
 
 const outline = items => {
   const points = items
