@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { LANGS, t, ui } from '../src/i18n.js'
+import { choose, LANGS, t, ui } from '../src/i18n.js'
 import catalog from '../src/models/catalog.json' with { type: 'json' }
 import { categories, models } from '../src/models/index.js'
 
@@ -40,4 +40,15 @@ test('every category and tool is named in every language', () => {
 test('plurals follow each language', () => {
   assert.equal(ui.en.steps(1), '<b>1</b> step')
   assert.equal(ui.es.steps(3), '<b>3</b> pasos')
+})
+
+test('the URL parameter beats the saved and the browser language', () => {
+  assert.equal(choose('?lang=es', 'en', 'en-US'), 'es')
+  assert.equal(choose('?model=tulip&lang=en', 'es', 'es-AR'), 'en')
+})
+
+test('the saved language beats the browser language, and anything unknown falls back', () => {
+  assert.equal(choose('', 'en', 'es-AR'), 'en')
+  assert.equal(choose('', null, 'es-AR'), 'es')
+  assert.equal(choose('?lang=fr', null, 'fr-FR'), 'en')
 })

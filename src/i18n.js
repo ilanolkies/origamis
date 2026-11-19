@@ -10,9 +10,10 @@ const stored = () => {
   }
 }
 
-const preferred = () => browser?.navigator.language.slice(0, 2)
+export const choose = (search, saved, preferred) =>
+  [new URLSearchParams(search).get('lang'), saved, preferred?.slice(0, 2)].find(code => LANGS.includes(code)) ?? 'en'
 
-export const lang = [stored(), preferred()].find(code => LANGS.includes(code)) ?? 'en'
+export const lang = choose(browser?.location.search, stored(), browser?.navigator.language)
 
 export const setLang = code => {
   try {

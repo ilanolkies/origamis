@@ -52,8 +52,19 @@ switcher.textContent = words.switchTo
 switcher.lang = words.switchCode
 switcher.addEventListener('click', () => {
   setLang(words.switchCode)
-  location.reload()
+  const params = new URLSearchParams(location.search)
+  params.set('lang', words.switchCode)
+  location.search = params.toString()
 })
+
+const query = id => {
+  const params = new URLSearchParams(location.search)
+  if (id) params.set('model', id)
+  else params.delete('model')
+  return params.size ? `?${params}` : location.pathname
+}
+
+home.href = query(null)
 
 const pieces = models.map(model => {
   const timeline = buildTimeline(model)
@@ -70,7 +81,7 @@ const pieces = models.map(model => {
 const at = ({ x, y }) => `left: ${x + MARGIN}px; top: ${y + MARGIN}px`
 
 const card = ({ model, facts, difficulty, steps }) => `
-      <a class="piece" href="?model=${model.id}" data-model="${model.id}" style="${at(facts.place)}; --tilt: ${facts.place.tilt}deg">
+      <a class="piece" href="${query(model.id)}" data-model="${model.id}" style="${at(facts.place)}; --tilt: ${facts.place.tilt}deg">
         <svg viewBox="0 0 1 1" role="img" aria-label="${t(model.name)}"></svg>
         <span class="label">
           <span class="kana" lang="ja">${model.kana}</span>
@@ -308,7 +319,7 @@ const sync = () => {
 }
 
 const go = id => {
-  history.pushState(null, '', id ? `?model=${id}` : location.pathname)
+  history.pushState(null, '', query(id))
   sync()
 }
 
@@ -330,5 +341,5 @@ addEventListener('keydown', event => {
 
 addEventListener('popstate', sync)
 
-if (location.search && !wanted()) history.replaceState(null, '', location.pathname)
+if (new URLSearchParams(location.search).has('model') && !wanted()) history.replaceState(null, '', query(null))
 if (wanted()) document.fonts.ready.then(() => setTimeout(sync, duration(SETTLE_MS)))
