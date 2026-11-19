@@ -14,8 +14,10 @@ export const refocus = ({ scale, next, focus, scroll }) => {
 const spread = touches => Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY)
 const middle = touches => [(touches[0].clientX + touches[1].clientX) / 2, (touches[0].clientY + touches[1].clientY) / 2]
 
-export const enableZoom = (pad, world) => {
-  let scale = 1
+export const enableZoom = (pad, world, initial = 1) => {
+  let scale = clampZoom(initial)
+  world.style.zoom = scale
+  world.style.setProperty('--zoom', scale)
 
   const zoomAt = (value, x, y) => {
     const next = clampZoom(value)
