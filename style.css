@@ -713,23 +713,16 @@ body:has(.sketchpad) {
 
   .viewer {
     grid-template-columns: minmax(0, 1fr);
-    align-content: start;
-    grid-auto-rows: max-content;
-    overflow-y: auto;
-    padding: calc(var(--mast, 60px) + 8px) 16px 24px;
+    grid-template-rows: minmax(0, 1fr);
+    padding: calc(var(--mast, 60px) + 8px) 16px 0;
   }
 
   .board {
-    padding-bottom: 0;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
   .masthead {
     padding: 14px 16px 4px;
-  }
-
-  .frame {
-    flex: none;
-    aspect-ratio: 1;
   }
 
   #steps {
