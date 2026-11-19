@@ -1,7 +1,7 @@
 import { difficultyOf, LEVELS, piecesOf } from './actions/index.js'
 import catalog from './models/catalog.json' with { type: 'json' }
 import categories from './models/categories.json' with { type: 'json' }
-import { lang, setLang, t, ui } from './i18n.js'
+import { LANGS, lang, NAMES, setLang, t, ui } from './i18n.js'
 import { categoryOf, models } from './models/index.js'
 import { defs, renderFrame } from './sketch.js'
 import { buildTimeline } from './timeline.js'
@@ -48,12 +48,13 @@ document.querySelector('.viewer').setAttribute('aria-label', words.stepsLabel)
 document.querySelector('#steps').setAttribute('aria-label', words.partsLabel)
 document.querySelector('#previous').setAttribute('aria-label', words.previous)
 document.querySelector('#next').setAttribute('aria-label', words.next)
-switcher.textContent = words.switchTo
-switcher.lang = words.switchCode
-switcher.addEventListener('click', () => {
-  setLang(words.switchCode)
+switcher.setAttribute('aria-label', words.language)
+switcher.innerHTML = LANGS.map(code => `<option value="${code}" lang="${code}">${NAMES[code]}</option>`).join('')
+switcher.value = lang
+switcher.addEventListener('change', () => {
+  setLang(switcher.value)
   const params = new URLSearchParams(location.search)
-  params.set('lang', words.switchCode)
+  params.set('lang', switcher.value)
   location.search = params.toString()
 })
 
