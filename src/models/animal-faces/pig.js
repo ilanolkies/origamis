@@ -1,3 +1,4 @@
+import { say } from '../../i18n.js'
 import { arc, cm, DIAMOND, HALVE_DOWN, mirror, SIDE_CM } from '../shapes.js'
 
 const EAR_TOP = [-0.6, 0]
@@ -14,36 +15,36 @@ const face = [
 
 export const pig = {
   id: 'pig-face',
-  name: 'Pig face',
+  name: say('Pig face', 'Cara de cerdo'),
   kana: 'ぶた',
   sheet: DIAMOND,
   sheetCm: SIDE_CM,
   parts: [
     {
       id: 'face',
-      name: 'Face',
+      name: say('Face', 'Cara'),
       kanji: '顔',
       tone: 'pig',
-      paper: `${SIDE_CM} cm square, pink on one side`,
+      paper: say(`${SIDE_CM} cm square, pink on one side`, `cuadrado de ${SIDE_CM} cm, rosa de un lado`),
       steps: [
         {
-          text: 'White side up, a corner toward you. Fold the top corner down to the bottom corner.',
+          text: say('White side up, a corner toward you. Fold the top corner down to the bottom corner.', 'Lado blanco hacia arriba, una esquina hacia ti. Dobla la esquina de arriba hacia la esquina de abajo.'),
           actions: [HALVE_DOWN],
         },
         {
-          text: `Fold the bottom point behind. The crease sits ${cm(1 + CHIN)} cm above the tip.`,
+          text: say(`Fold the bottom point behind. The crease sits ${cm(1 + CHIN)} cm above the tip.`, `Dobla la punta de abajo hacia atrás. El pliegue queda a ${cm(1 + CHIN)} cm por encima de la punta.`),
           actions: [{ from: [-1, CHIN], to: [1, CHIN], mover: [0, -1], kind: 'mountain', bend: 1 }],
         },
         {
-          text: `Fold the left corner down to make a small ear. The crease runs from ${cm(-EAR_TOP[0])} cm left of the middle of the top edge to a spot ${cm(-EAR_EDGE[1])} cm down the left edge.`,
+          text: say(`Fold the left corner down to make a small ear. The crease runs from ${cm(-EAR_TOP[0])} cm left of the middle of the top edge to a spot ${cm(-EAR_EDGE[1])} cm down the left edge.`, `Dobla la esquina izquierda hacia abajo para hacer una oreja pequeña. El pliegue va desde un punto a ${cm(-EAR_TOP[0])} cm a la izquierda de la mitad del borde de arriba hasta un punto a ${cm(-EAR_EDGE[1])} cm hacia abajo por el borde izquierdo.`),
           actions: [{ from: EAR_TOP, to: EAR_EDGE, mover: [-1, 0], kind: 'valley', bend: 1 }],
         },
         {
-          text: 'Repeat on the right. The two ears should hang level.',
+          text: say('Repeat on the right. The two ears should hang level.', 'Repite a la derecha. Las dos orejas deben caer a la misma altura.'),
           actions: [{ from: mirror(EAR_TOP), to: mirror(EAR_EDGE), mover: [1, 0], kind: 'valley', bend: -1 }],
         },
         {
-          text: 'Draw the face: two eyes and a round snout with two nostrils.',
+          text: say('Draw the face: two eyes and a round snout with two nostrils.', 'Dibuja la cara: dos ojos y un hocico redondo con dos fosas nasales.'),
           actions: [{ kind: 'draw', strokes: face }],
         },
       ],

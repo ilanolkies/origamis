@@ -70,7 +70,7 @@ const blossom = {
 }
 
 test('assembling three pieces places every face at its seat', () => {
-  const timeline = buildTimeline(threePieces)
+  const timeline = buildTimeline(threePieces, 'en')
   const a = folded(HALVE_UP)
   const b = folded(SIDE)
   const c = fold(folded(HALVE_UP), SIDE).faces

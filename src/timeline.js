@@ -1,5 +1,6 @@
 import { actions, piecesOf } from './actions/index.js'
 import { sheet } from './geometry.js'
+import { lang, t, ui } from './i18n.js'
 import { ease, fitView, look, mixView, placed, shifted } from './scene.js'
 
 const SLIDE = 2.6
@@ -21,14 +22,15 @@ const swapPhase = (leaving, arriving) => {
   }
 }
 
-export const buildTimeline = model => {
+export const buildTimeline = (model, code = lang) => {
+  const words = ui[code]
   const steps = []
   const sections = []
   const finals = {}
   let shown = null
 
   for (const part of model.parts) {
-    const section = { name: part.name, kanji: part.kanji, paper: part.paper, steps: [] }
+    const section = { name: t(part.name, code), kanji: part.kanji, paper: t(part.paper, code), steps: [] }
     let paper = { faces: sheet(model.sheet), doodles: [], folds: [], creases: [], tone: part.tone, back: part.back }
     part.steps.forEach((step, index) => {
       const start = look(paper)
@@ -42,7 +44,7 @@ export const buildTimeline = model => {
       }
       const entry = {
         number: steps.length + 1,
-        text: step.text,
+        text: t(step.text, code),
         phases,
         start: swap ? shown : start,
         marks: swap ? [] : marks,
@@ -61,9 +63,9 @@ export const buildTimeline = model => {
   if (assembly) {
     const pieces = piecesOf(model)
     const section = {
-      name: assembly.name,
+      name: t(assembly.name, code),
       kanji: assembly.kanji,
-      paper: pieces === 2 ? 'Both pieces' : `All ${pieces} pieces`,
+      paper: pieces === 2 ? words.bothPieces : words.allPieces(pieces),
       steps: [],
     }
     let items = placed(finals[assembly.base.part], assembly.base)
@@ -76,7 +78,7 @@ export const buildTimeline = model => {
         phases.push(done.phase)
         items = done.items
       }
-      const entry = { number: steps.length + 1, text: step.text, phases, start, marks, after: items }
+      const entry = { number: steps.length + 1, text: t(step.text, code), phases, start, marks, after: items }
       steps.push(entry)
       section.steps.push(entry)
     }

@@ -1,7 +1,9 @@
+import { lang, t, ui } from './i18n.js'
 import { renderFrame, thumbnail } from './sketch.js'
 import { buildTimeline } from './timeline.js'
 
 const BOIL_MS = 150
+const words = ui[lang]
 
 const sections = timeline =>
   timeline.sections
@@ -51,8 +53,8 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
 
   const describe = current => {
     const done = current > total
-    count.textContent = done ? 'できた！' : `Step ${current} / ${total}`
-    caption.textContent = done ? `Your ${model.name.toLowerCase()} is done.` : timeline.steps[current - 1].text
+    count.textContent = done ? 'できた！' : words.step(current, total)
+    caption.textContent = done ? words.done(t(model.name)) : timeline.steps[current - 1].text
     previousButton.disabled = position === 0 && landing === null
     nextButton.disabled = position === total && landing === null
     for (const button of panel.querySelectorAll('.step')) {
@@ -183,7 +185,7 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
       timeline = buildTimeline(chosen)
       total = timeline.steps.length
       position = total
-      stage.setAttribute('aria-label', `Animated folding of the ${chosen.name.toLowerCase()}`)
+      stage.setAttribute('aria-label', words.animation(t(chosen.name)))
       panel.innerHTML = sections(timeline)
       panel.scrollTop = 0
       rest()
