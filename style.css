@@ -733,7 +733,7 @@ body:has(.sketchpad) {
   }
 
   #steps {
-    overflow: visible;
+    display: none;
   }
 
   .turn {
