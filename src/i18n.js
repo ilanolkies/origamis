@@ -1,4 +1,6 @@
-export const LANGS = ['en', 'es']
+export const NAMES = { en: 'English', es: 'Español' }
+
+export const LANGS = Object.keys(NAMES)
 
 const browser = globalThis.window
 
@@ -32,8 +34,7 @@ const unit = (one, many) => count => `<b>${count}</b> ${count === 1 ? one : many
 export const ui = {
   en: {
     title: 'Origami 折り紙',
-    switchTo: 'Español',
-    switchCode: 'es',
+    language: 'Language',
     stepsLabel: 'Folding steps',
     partsLabel: 'Parts and steps',
     previous: 'Previous step',
@@ -63,8 +64,7 @@ export const ui = {
   },
   es: {
     title: 'Origami 折り紙',
-    switchTo: 'English',
-    switchCode: 'en',
+    language: 'Idioma',
     stepsLabel: 'Pasos de plegado',
     partsLabel: 'Piezas y pasos',
     previous: 'Paso anterior',

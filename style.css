@@ -39,9 +39,6 @@ body {
 }
 
 .masthead {
-  position: relative;
-  z-index: 4;
-  pointer-events: none;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -51,7 +48,7 @@ body {
 }
 
 .masthead a,
-.masthead button {
+.masthead select {
   pointer-events: auto;
 }
 
