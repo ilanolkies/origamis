@@ -1,6 +1,7 @@
 import { difficultyOf, LEVELS, piecesOf } from './actions/index.js'
 import catalog from './models/catalog.json' with { type: 'json' }
 import categories from './models/categories.json' with { type: 'json' }
+import { lang, setLang, t, ui } from './i18n.js'
 import { categoryOf, models } from './models/index.js'
 import { defs, renderFrame } from './sketch.js'
 import { buildTimeline } from './timeline.js'
@@ -18,7 +19,8 @@ const UNFOLD_MS = 2200
 const FOLD_UP_MS = 900
 const RETURN_MS = 700
 const SETTLE_MS = 400
-const TITLE = document.title
+const words = ui[lang]
+const TITLE = words.title
 
 const root = document.documentElement
 const masthead = document.querySelector('.masthead')
@@ -27,6 +29,7 @@ const tag = document.querySelector('#model')
 const sketchpad = document.querySelector('#gallery')
 const stage = document.querySelector('#stage')
 const calm = matchMedia('(prefers-reduced-motion: reduce)')
+const switcher = document.querySelector('#lang')
 
 const viewer = createViewer({
   stage,
@@ -37,6 +40,19 @@ const viewer = createViewer({
   caption: document.querySelector('#caption'),
   previousButton: document.querySelector('#previous'),
   nextButton: document.querySelector('#next'),
+})
+
+root.lang = lang
+document.title = TITLE
+document.querySelector('.viewer').setAttribute('aria-label', words.stepsLabel)
+document.querySelector('#steps').setAttribute('aria-label', words.partsLabel)
+document.querySelector('#previous').setAttribute('aria-label', words.previous)
+document.querySelector('#next').setAttribute('aria-label', words.next)
+switcher.textContent = words.switchTo
+switcher.lang = words.switchCode
+switcher.addEventListener('click', () => {
+  setLang(words.switchCode)
+  location.reload()
 })
 
 const pieces = models.map(model => {
@@ -51,27 +67,26 @@ const pieces = models.map(model => {
   }
 })
 
-const plural = (count, word) => `<b>${count}</b> ${word}${count === 1 ? '' : 's'}`
 const at = ({ x, y }) => `left: ${x + MARGIN}px; top: ${y + MARGIN}px`
 
 const card = ({ model, facts, difficulty, steps }) => `
       <a class="piece" href="?model=${model.id}" data-model="${model.id}" style="${at(facts.place)}; --tilt: ${facts.place.tilt}deg">
-        <svg viewBox="0 0 1 1" role="img" aria-label="${model.name}"></svg>
+        <svg viewBox="0 0 1 1" role="img" aria-label="${t(model.name)}"></svg>
         <span class="label">
           <span class="kana" lang="ja">${model.kana}</span>
-          <span class="name">${model.name}</span>
-          <span class="tag">${categoryOf(model)}</span>
+          <span class="name">${t(model.name)}</span>
+          <span class="tag">${words.categories[categoryOf(model)]}</span>
           <span class="facts">
-            <span>${plural(piecesOf(model), 'piece')}</span>
-            <span>${plural(steps, 'step')}</span>
-            <span><b>${facts.minutes}</b> min</span>
+            <span>${words.pieces(piecesOf(model))}</span>
+            <span>${words.steps(steps)}</span>
+            <span><b>${facts.minutes}</b> ${words.minutes}</span>
           </span>
-          <span class="level" role="img" aria-label="Difficulty ${difficulty} of ${LEVELS}">
-            <span>Difficulty</span>
+          <span class="level" role="img" aria-label="${words.difficultyLabel(difficulty, LEVELS)}">
+            <span>${words.difficulty}</span>
             <span class="bar"><span class="fill" style="width: ${(difficulty / LEVELS) * 100}%"></span></span>
             <span>${difficulty}/${LEVELS}</span>
           </span>
-          <span class="needs">${model.paper ?? `${model.sheetCm} cm paper`} · ${facts.tools.join(', ')}</span>
+          <span class="needs">${model.paper ? t(model.paper) : words.paper(model.sheetCm)} · ${facts.tools.map(tool => words.tools[tool]).join(', ')}</span>
         </span>
       </a>`
 
@@ -85,7 +100,7 @@ document.body.insertAdjacentHTML('afterbegin', defs)
 sketchpad.innerHTML = `
   <div class="world" style="width: ${reach('x', PIECE_SIZE) + 2 * MARGIN}px; height: ${reach('y', PIECE_SIZE) + 2 * MARGIN}px">
     ${Object.entries(categories)
-      .map(([name, place]) => `<h2 class="chip" style="${at(place)}">${name}</h2>`)
+      .map(([name, place]) => `<h2 class="chip" style="${at(place)}">${words.categories[name]}</h2>`)
       .join('')}
     ${pieces.map(card).join('')}
   </div>`
@@ -242,8 +257,8 @@ const open = (model, done) => {
 const fly = (model, piece, done) => {
   const from = spotOf(piece)
   viewer.load(model)
-  tag.innerHTML = `<span lang="ja">${model.kana}</span> ${model.name}`
-  document.title = `${model.name} ${model.kana}`
+  tag.innerHTML = `<span lang="ja">${model.kana}</span> ${t(model.name)}`
+  document.title = `${t(model.name)} ${model.kana}`
   piece.classList.add('chosen')
   root.classList.add('viewing')
   const flight = stage.animate([{ transform: placed(from) }, { transform: 'none' }], {

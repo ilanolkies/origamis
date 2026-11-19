@@ -1,4 +1,5 @@
 import { length, polar, sub } from '../../geometry.js'
+import { say } from '../../i18n.js'
 import { arc, CENTRE, cm, DIAMOND, edgeReach, HALVE_UP, mirror, SIDE_CM } from '../shapes.js'
 
 const BROW = 0.55
@@ -25,29 +26,29 @@ const face = [
 
 export const head = {
   id: 'head',
-  name: 'Head',
+  name: say('Head', 'Cabeza'),
   kanji: '頭',
   tone: 'fur',
-  paper: `${SIDE_CM} cm square, orange on one side`,
+  paper: say(`${SIDE_CM} cm square, orange on one side`, `cuadrado de ${SIDE_CM} cm, naranja de un lado`),
   steps: [
     {
-      text: 'White side up, a corner toward you. Fold the bottom corner up to the top corner.',
+      text: say('White side up, a corner toward you. Fold the bottom corner up to the top corner.', 'Lado blanco hacia arriba, una esquina hacia ti. Dobla la esquina de abajo hacia la esquina de arriba.'),
       actions: [HALVE_UP],
     },
     {
-      text: `Fold the top point behind. The crease sits ${cm(1 - BROW)} cm below the tip.`,
+      text: say(`Fold the top point behind. The crease sits ${cm(1 - BROW)} cm below the tip.`, `Dobla la punta de arriba hacia atrás. El pliegue queda a ${cm(1 - BROW)} cm de la punta.`),
       actions: [{ from: [-1, BROW], to: [1, BROW], mover: [0, 1], kind: 'mountain', bend: 1 }],
     },
     {
-      text: `Fold the right corner up behind to make an ear. The crease runs from the middle of the bottom edge to a spot ${cm(length(sub([1, 0], cheek)))} cm up the right edge.`,
+      text: say(`Fold the right corner up behind to make an ear. The crease runs from the middle of the bottom edge to a spot ${cm(length(sub([1, 0], cheek)))} cm up the right edge.`, `Dobla la esquina derecha hacia arriba y hacia atrás para hacer una oreja. El pliegue va desde la mitad del borde de abajo hasta un punto a ${cm(length(sub([1, 0], cheek)))} cm hacia arriba por el borde derecho.`),
       actions: [{ from: CENTRE, to: cheek, mover: [1, 0], kind: 'mountain', bend: -1 }],
     },
     {
-      text: 'Repeat on the left. The two ears should sit level.',
+      text: say('Repeat on the left. The two ears should sit level.', 'Repite a la izquierda. Las dos orejas deben quedar a la misma altura.'),
       actions: [{ from: CENTRE, to: mirror(cheek), mover: [-1, 0], kind: 'mountain', bend: 1 }],
     },
     {
-      text: 'Draw the face: happy eyes, a nose, whiskers and three stripes.',
+      text: say('Draw the face: happy eyes, a nose, whiskers and three stripes.', 'Dibuja la cara: ojos felices, una nariz, bigotes y tres rayas.'),
       actions: [{ kind: 'draw', strokes: face }],
     },
   ],
@@ -55,7 +56,7 @@ export const head = {
 
 export const catFace = {
   id: 'cat-face',
-  name: 'Cat face',
+  name: say('Cat face', 'Cara de gato'),
   kana: 'ねこ',
   sheet: DIAMOND,
   sheetCm: SIDE_CM,

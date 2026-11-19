@@ -1,4 +1,5 @@
 import { add, apply, reflection, scale, sub, unit } from '../../geometry.js'
+import { say } from '../../i18n.js'
 import { cm, DIAMOND, HALVE_DOWN, mirror, SIDE_CM } from '../shapes.js'
 
 const LOBE = -0.25
@@ -35,36 +36,36 @@ const corner = side => behind(side, along(CORNER, [0, -1], SIDE_CUT), along(CORN
 
 export const heart = {
   id: 'heart',
-  name: 'Heart',
+  name: say('Heart', 'Corazón'),
   kana: 'ハート',
   sheet: DIAMOND,
   sheetCm: SIDE_CM,
   parts: [
     {
       id: 'heart',
-      name: 'Heart',
+      name: say('Heart', 'Corazón'),
       kanji: '心',
       tone: 'heart',
-      paper: `${SIDE_CM} cm square, red on one side`,
+      paper: say(`${SIDE_CM} cm square, red on one side`, `cuadrado de ${SIDE_CM} cm, rojo de un lado`),
       steps: [
         {
-          text: 'White side up, a corner toward you. Fold the top corner down to the bottom corner.',
+          text: say('White side up, a corner toward you. Fold the top corner down to the bottom corner.', 'Lado blanco hacia arriba, una esquina hacia ti. Dobla la esquina de arriba hacia la esquina de abajo.'),
           actions: [HALVE_DOWN],
         },
         {
-          text: 'Fold the left and right corners down to the bottom corner.',
+          text: say('Fold the left and right corners down to the bottom corner.', 'Dobla las esquinas izquierda y derecha hacia la esquina de abajo.'),
           actions: [sideDown(-1), sideDown(1)],
         },
         {
-          text: 'Fold the bottom points of the two flaps up and out past the top to make the lobes.',
+          text: say('Fold the bottom points of the two flaps up and out past the top to make the lobes.', 'Dobla las puntas de abajo de las dos solapas hacia arriba y hacia afuera, más allá de arriba, para hacer los lóbulos.'),
           actions: [lobe(-1), lobe(1)],
         },
         {
-          text: `Fold the top corner behind, ${cm(-NOTCH)} cm down, leaving the lobes in front.`,
+          text: say(`Fold the top corner behind, ${cm(-NOTCH)} cm down, leaving the lobes in front.`, `Dobla la esquina de arriba hacia atrás, ${cm(-NOTCH)} cm hacia abajo, dejando los lóbulos por delante.`),
           actions: [{ from: [-1, NOTCH], to: [1, NOTCH], mover: [0, 0], kind: 'mountain', bend: 1, layers: 'bottom' }],
         },
         {
-          text: 'Fold the tips of the lobes and the two side corners behind to round the heart.',
+          text: say('Fold the tips of the lobes and the two side corners behind to round the heart.', 'Dobla hacia atrás las puntas de los lóbulos y las dos esquinas laterales para redondear el corazón.'),
           actions: [tip(-1), tip(1), corner(-1), corner(1)],
         },
       ],

@@ -1,3 +1,4 @@
+import { say } from '../../i18n.js'
 import { LONG, SIDE_CM } from '../shapes.js'
 import { houseSteps, SQUARE } from './house.js'
 
@@ -18,29 +19,29 @@ const blackKeys = [1, 2, 4, 5, 6].map(i => blackKey(-HALF + i * KEY))
 
 export const piano = {
   id: 'piano',
-  name: 'Piano',
+  name: say('Piano', 'Piano'),
   kana: 'ピアノ',
   sheet: SQUARE,
   sheetCm: SIDE_CM,
   parts: [
     {
       id: 'piano',
-      name: 'Piano',
+      name: say('Piano', 'Piano'),
       kanji: '洋琴',
       tone: 'piano',
-      paper: `${SIDE_CM} cm square, black on one side`,
+      paper: say(`${SIDE_CM} cm square, black on one side`, `cuadrado de ${SIDE_CM} cm, negro de un lado`),
       steps: [
         ...houseSteps,
         {
-          text: 'Fold the left and right sides behind along the edges of the roof.',
+          text: say('Fold the left and right sides behind along the edges of the roof.', 'Dobla los lados izquierdo y derecho hacia atrás por los bordes del techo.'),
           actions: [behind(-1), behind(1)],
         },
         {
-          text: 'Fold the bottom edge behind, leaving a white strip for the keys.',
+          text: say('Fold the bottom edge behind, leaving a white strip for the keys.', 'Dobla el borde de abajo hacia atrás, dejando una tira blanca para las teclas.'),
           actions: [{ from: [-LONG, KEYS], to: [LONG, KEYS], mover: [0, -LONG], kind: 'mountain', bend: 1 }],
         },
         {
-          text: 'Draw the keys.',
+          text: say('Draw the keys.', 'Dibuja las teclas.'),
           actions: [{ kind: 'draw', strokes: [...whiteKeys, ...blackKeys] }],
         },
       ],

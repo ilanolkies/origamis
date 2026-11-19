@@ -79,6 +79,18 @@ h1 span {
   color: var(--green);
 }
 
+.lang {
+  margin: 0 0 0 auto;
+  font: 400 1.1rem var(--marker);
+  color: inherit;
+  padding: 2px 14px;
+  border: 2.5px solid var(--ink);
+  border-radius: var(--scribble);
+  background: var(--sheet);
+  cursor: pointer;
+  transform: rotate(-1.5deg);
+}
+
 .viewer {
   position: fixed;
   inset: 0;
