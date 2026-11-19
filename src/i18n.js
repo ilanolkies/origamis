@@ -49,6 +49,9 @@ export const ui = {
   en: {
     title: 'Origami 折り紙',
     language: 'Language',
+    back: 'Back',
+    share: 'Share',
+    copied: 'Link copied',
     stepsLabel: 'Folding steps',
     partsLabel: 'Parts and steps',
     previous: 'Previous step',
@@ -79,6 +82,9 @@ export const ui = {
   es: {
     title: 'Origami 折り紙',
     language: 'Idioma',
+    back: 'Volver',
+    share: 'Compartir',
+    copied: 'Enlace copiado',
     stepsLabel: 'Pasos de plegado',
     partsLabel: 'Piezas y pasos',
     previous: 'Paso anterior',

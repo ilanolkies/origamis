@@ -14,7 +14,10 @@
   </head>
   <body>
     <header class="masthead">
-      <h1><a id="home" href="./"><span lang="ja">折り紙</span> Origami</a></h1>
+      <div class="brand">
+        <button id="back" type="button" class="back">←</button>
+        <h1><a id="home" href="./"><span lang="ja">折り紙</span> Origami</a></h1>
+      </div>
       <select id="lang" class="lang"></select>
       <p class="model" id="model"></p>
     </header>
@@ -38,6 +41,7 @@
       </div>
       <aside id="steps" aria-label="Parts and steps"></aside>
     </section>
+    <button id="share" type="button" class="share"></button>
     <script type="module" src="src/main.js"></script>
   </body>
 </html>
