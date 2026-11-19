@@ -21,6 +21,7 @@ const FOLD_UP_MS = 900
 const RETURN_MS = 700
 const SETTLE_MS = 400
 const PHONE_ZOOM = 0.4
+const COPIED_MS = 1800
 
 const root = document.documentElement
 const masthead = document.querySelector('.masthead')
@@ -30,6 +31,8 @@ const sketchpad = document.querySelector('#gallery')
 const stage = document.querySelector('#stage')
 const calm = matchMedia('(prefers-reduced-motion: reduce)')
 const switcher = document.querySelector('#lang')
+const back = document.querySelector('#back')
+const share = document.querySelector('#share')
 
 const href = changes => query(location.search, location.pathname, changes)
 
@@ -320,6 +323,20 @@ home.addEventListener('click', event => {
   if (shown) go(null)
 })
 
+back.addEventListener('click', () => {
+  if (shown) go(null)
+})
+
+share.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(new URL(href({ step: null }), location.href).href)
+  } catch {
+    return
+  }
+  share.textContent = words().copied
+  setTimeout(() => (share.textContent = words().share), COPIED_MS)
+})
+
 addEventListener('keydown', event => {
   if (event.key === 'Escape' && shown) go(null)
 })
@@ -336,6 +353,9 @@ const localize = () => {
   document.querySelector('#previous').setAttribute('aria-label', text.previous)
   document.querySelector('#next').setAttribute('aria-label', text.next)
   switcher.setAttribute('aria-label', text.language)
+  back.setAttribute('aria-label', text.back)
+  back.title = text.back
+  share.textContent = text.share
   switcher.value = lang
   for (const chip of sketchpad.querySelectorAll('.chip')) chip.textContent = text.categories[chip.dataset.category]
   for (const piece of pieces) {
