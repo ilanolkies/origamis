@@ -1,9 +1,8 @@
-import { lang, t, ui } from './i18n.js'
+import { t, words } from './i18n.js'
 import { renderFrame, thumbnail } from './sketch.js'
 import { buildTimeline } from './timeline.js'
 
 const BOIL_MS = 150
-const words = ui[lang]
 
 const sections = timeline =>
   timeline.sections
@@ -33,7 +32,7 @@ const sections = timeline =>
     )
     .join('')
 
-export const createViewer = ({ stage, layer, shouts, panel, count, caption, previousButton, nextButton }) => {
+export const createViewer = ({ stage, layer, shouts, panel, count, caption, previousButton, nextButton, onStep }) => {
   const calm = matchMedia('(prefers-reduced-motion: reduce)')
   let model = null
   let timeline = null
@@ -53,8 +52,8 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
 
   const describe = current => {
     const done = current > total
-    count.textContent = done ? 'できた！' : words.step(current, total)
-    caption.textContent = done ? words.done(t(model.name)) : timeline.steps[current - 1].text
+    count.textContent = done ? 'できた！' : words().step(current, total)
+    caption.textContent = done ? words().done(t(model.name)) : timeline.steps[current - 1].text
     previousButton.disabled = position === 0 && landing === null
     nextButton.disabled = position === total && landing === null
     for (const button of panel.querySelectorAll('.step')) {
@@ -63,6 +62,7 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
       button.classList.toggle('current', stepNumber === current)
       if (stepNumber === current && !sweeping) button.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
     }
+    if (live && !sweeping) onStep(current)
   }
 
   const rest = () => {
@@ -70,10 +70,10 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
     describe(position + 1)
   }
 
-  const shout = words => {
+  const shout = sounds => {
     const word = document.createElement('span')
     word.className = 'shout'
-    word.textContent = words[Math.floor(Math.random() * words.length)]
+    word.textContent = sounds[Math.floor(Math.random() * sounds.length)]
     word.style.left = `${8 + Math.random() * 60}%`
     word.style.top = `${6 + Math.random() * 22}%`
     word.style.setProperty('--turn', `${-14 + Math.random() * 28}deg`)
@@ -185,10 +185,19 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
       timeline = buildTimeline(chosen)
       total = timeline.steps.length
       position = total
-      stage.setAttribute('aria-label', words.animation(t(chosen.name)))
+      stage.setAttribute('aria-label', words().animation(t(chosen.name)))
       panel.innerHTML = sections(timeline)
       panel.scrollTop = 0
       rest()
+    },
+    translate() {
+      if (!model) return
+      timeline = buildTimeline(model)
+      const scrolled = panel.scrollTop
+      panel.innerHTML = sections(timeline)
+      panel.scrollTop = scrolled
+      stage.setAttribute('aria-label', words().animation(t(model.name)))
+      if (landing === null) describe(position + 1)
     },
     sweep,
     start() {

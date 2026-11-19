@@ -1,6 +1,6 @@
 import { actions, piecesOf } from './actions/index.js'
 import { sheet } from './geometry.js'
-import { lang, t, ui } from './i18n.js'
+import { getLang, t, ui } from './i18n.js'
 import { ease, fitView, look, mixView, placed, shifted } from './scene.js'
 
 const SLIDE = 2.6
@@ -22,7 +22,7 @@ const swapPhase = (leaving, arriving) => {
   }
 }
 
-export const buildTimeline = (model, code = lang) => {
+export const buildTimeline = (model, code = getLang()) => {
   const words = ui[code]
   const steps = []
   const sections = []
