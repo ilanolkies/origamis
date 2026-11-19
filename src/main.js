@@ -1,10 +1,11 @@
 import { difficultyOf, LEVELS, piecesOf } from './actions/index.js'
 import catalog from './models/catalog.json' with { type: 'json' }
 import categories from './models/categories.json' with { type: 'json' }
-import { LANGS, lang, NAMES, setLang, t, ui } from './i18n.js'
+import { getLang, LANGS, NAMES, onLang, setLang, t, words } from './i18n.js'
 import { categoryOf, models } from './models/index.js'
 import { defs, renderFrame } from './sketch.js'
 import { buildTimeline } from './timeline.js'
+import { query, stepIn } from './url.js'
 import { createViewer } from './viewer.js'
 import { enableZoom } from './zoom.js'
 
@@ -19,8 +20,6 @@ const UNFOLD_MS = 2200
 const FOLD_UP_MS = 900
 const RETURN_MS = 700
 const SETTLE_MS = 400
-const words = ui[lang]
-const TITLE = words.title
 
 const root = document.documentElement
 const masthead = document.querySelector('.masthead')
@@ -31,6 +30,8 @@ const stage = document.querySelector('#stage')
 const calm = matchMedia('(prefers-reduced-motion: reduce)')
 const switcher = document.querySelector('#lang')
 
+const href = changes => query(location.search, location.pathname, changes)
+
 const viewer = createViewer({
   stage,
   layer: document.querySelector('#frame'),
@@ -40,32 +41,11 @@ const viewer = createViewer({
   caption: document.querySelector('#caption'),
   previousButton: document.querySelector('#previous'),
   nextButton: document.querySelector('#next'),
+  onStep: step => history.replaceState(null, '', href({ step })),
 })
 
-root.lang = lang
-document.title = TITLE
-document.querySelector('.viewer').setAttribute('aria-label', words.stepsLabel)
-document.querySelector('#steps').setAttribute('aria-label', words.partsLabel)
-document.querySelector('#previous').setAttribute('aria-label', words.previous)
-document.querySelector('#next').setAttribute('aria-label', words.next)
-switcher.setAttribute('aria-label', words.language)
 switcher.innerHTML = LANGS.map(code => `<option value="${code}" lang="${code}">${NAMES[code]}</option>`).join('')
-switcher.value = lang
-switcher.addEventListener('change', () => {
-  setLang(switcher.value)
-  const params = new URLSearchParams(location.search)
-  params.set('lang', switcher.value)
-  location.search = params.toString()
-})
-
-const query = id => {
-  const params = new URLSearchParams(location.search)
-  if (id) params.set('model', id)
-  else params.delete('model')
-  return params.size ? `?${params}` : location.pathname
-}
-
-home.href = query(null)
+switcher.addEventListener('change', () => setLang(switcher.value))
 
 const pieces = models.map(model => {
   const timeline = buildTimeline(model)
@@ -81,25 +61,27 @@ const pieces = models.map(model => {
 
 const at = ({ x, y }) => `left: ${x + MARGIN}px; top: ${y + MARGIN}px`
 
-const card = ({ model, facts, difficulty, steps }) => `
-      <a class="piece" href="${query(model.id)}" data-model="${model.id}" style="${at(facts.place)}; --tilt: ${facts.place.tilt}deg">
-        <svg viewBox="0 0 1 1" role="img" aria-label="${t(model.name)}"></svg>
-        <span class="label">
+const label = ({ model, facts, difficulty, steps }) => `
           <span class="kana" lang="ja">${model.kana}</span>
           <span class="name">${t(model.name)}</span>
-          <span class="tag">${words.categories[categoryOf(model)]}</span>
+          <span class="tag">${words().categories[categoryOf(model)]}</span>
           <span class="facts">
-            <span>${words.pieces(piecesOf(model))}</span>
-            <span>${words.steps(steps)}</span>
-            <span><b>${facts.minutes}</b> ${words.minutes}</span>
+            <span>${words().pieces(piecesOf(model))}</span>
+            <span>${words().steps(steps)}</span>
+            <span><b>${facts.minutes}</b> ${words().minutes}</span>
           </span>
-          <span class="level" role="img" aria-label="${words.difficultyLabel(difficulty, LEVELS)}">
-            <span>${words.difficulty}</span>
+          <span class="level" role="img" aria-label="${words().difficultyLabel(difficulty, LEVELS)}">
+            <span>${words().difficulty}</span>
             <span class="bar"><span class="fill" style="width: ${(difficulty / LEVELS) * 100}%"></span></span>
             <span>${difficulty}/${LEVELS}</span>
           </span>
-          <span class="needs">${model.paper ? t(model.paper) : words.paper(model.sheetCm)} · ${facts.tools.map(tool => words.tools[tool]).join(', ')}</span>
-        </span>
+          <span class="needs">${model.paper ? t(model.paper) : words().paper(model.sheetCm)} · ${facts.tools.map(tool => words().tools[tool]).join(', ')}</span>
+        `
+
+const card = ({ model, facts }) => `
+      <a class="piece" data-model="${model.id}" style="${at(facts.place)}; --tilt: ${facts.place.tilt}deg">
+        <svg viewBox="0 0 1 1" role="img"></svg>
+        <span class="label"></span>
       </a>`
 
 const reach = (axis, size) =>
@@ -112,7 +94,7 @@ document.body.insertAdjacentHTML('afterbegin', defs)
 sketchpad.innerHTML = `
   <div class="world" style="width: ${reach('x', PIECE_SIZE) + 2 * MARGIN}px; height: ${reach('y', PIECE_SIZE) + 2 * MARGIN}px">
     ${Object.entries(categories)
-      .map(([name, place]) => `<h2 class="chip" style="${at(place)}">${words.categories[name]}</h2>`)
+      .map(([name, place]) => `<h2 class="chip" data-category="${name}" style="${at(place)}"></h2>`)
       .join('')}
     ${pieces.map(card).join('')}
   </div>`
@@ -281,7 +263,7 @@ const fly = (model, piece, done) => {
     busy = false
     root.classList.add('docked')
     viewer.start()
-    viewer.sweep(0, UNFOLD_MS)
+    viewer.sweep(stepIn(location.search, viewer.total) - 1, UNFOLD_MS)
     done()
   })
 }
@@ -291,7 +273,7 @@ const close = done => {
   const piece = sketchpad.querySelector('.chosen')
   viewer.stop()
   root.classList.remove('docked')
-  document.title = TITLE
+  document.title = words().title
   viewer.sweep(viewer.total, duration(FOLD_UP_MS), () => {
     const flight = stage.animate([{ transform: 'none' }, { transform: placed(spotOf(piece)) }], {
       duration: duration(RETURN_MS),
@@ -320,7 +302,7 @@ const sync = () => {
 }
 
 const go = id => {
-  history.pushState(null, '', query(id))
+  history.pushState(null, '', href({ model: id, step: null }))
   sync()
 }
 
@@ -342,5 +324,35 @@ addEventListener('keydown', event => {
 
 addEventListener('popstate', sync)
 
-if (new URLSearchParams(location.search).has('model') && !wanted()) history.replaceState(null, '', query(null))
+const localize = () => {
+  const lang = getLang()
+  const text = words()
+  root.lang = lang
+  document.title = shown ? `${t(shown.name)} ${shown.kana}` : text.title
+  document.querySelector('.viewer').setAttribute('aria-label', text.stepsLabel)
+  document.querySelector('#steps').setAttribute('aria-label', text.partsLabel)
+  document.querySelector('#previous').setAttribute('aria-label', text.previous)
+  document.querySelector('#next').setAttribute('aria-label', text.next)
+  switcher.setAttribute('aria-label', text.language)
+  switcher.value = lang
+  for (const chip of sketchpad.querySelectorAll('.chip')) chip.textContent = text.categories[chip.dataset.category]
+  for (const piece of pieces) {
+    const element = sketchpad.querySelector(`[data-model="${piece.model.id}"]`)
+    element.href = href({ model: piece.model.id, step: null })
+    element.querySelector('svg').setAttribute('aria-label', t(piece.model.name))
+    element.querySelector('.label').innerHTML = label(piece)
+  }
+  home.href = href({ model: null, step: null })
+  if (shown) tag.innerHTML = `<span lang="ja">${shown.kana}</span> ${t(shown.name)}`
+  viewer.translate()
+}
+
+onLang(code => {
+  history.replaceState(null, '', href({ lang: code }))
+  localize()
+})
+
+localize()
+
+if (new URLSearchParams(location.search).has('model') && !wanted()) history.replaceState(null, '', href({ model: null, step: null }))
 if (wanted()) document.fonts.ready.then(() => setTimeout(sync, duration(SETTLE_MS)))

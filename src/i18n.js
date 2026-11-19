@@ -15,9 +15,15 @@ const stored = () => {
 export const choose = (search, saved, preferred) =>
   [new URLSearchParams(search).get('lang'), saved, preferred?.slice(0, 2)].find(code => LANGS.includes(code)) ?? 'en'
 
-export const lang = choose(browser?.location.search, stored(), browser?.navigator.language)
+let current = choose(browser?.location.search, stored(), browser?.navigator.language)
 
-export const setLang = code => {
+const listeners = []
+
+export const getLang = () => current
+
+export const onLang = listener => listeners.push(listener)
+
+const save = code => {
   try {
     browser.localStorage.setItem('lang', code)
   } catch {
@@ -25,11 +31,19 @@ export const setLang = code => {
   }
 }
 
+export const setLang = code => {
+  current = code
+  save(code)
+  listeners.forEach(listener => listener(code))
+}
+
 export const say = (en, es) => ({ en, es })
 
-export const t = (text, code = lang) => text[code]
+export const t = (text, code = current) => text[code]
 
 const unit = (one, many) => count => `<b>${count}</b> ${count === 1 ? one : many}`
+
+export const words = () => ui[current]
 
 export const ui = {
   en: {
