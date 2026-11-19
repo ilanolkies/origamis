@@ -51,6 +51,15 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
     layer.innerHTML = markup
   }
 
+  const keepInView = button => {
+    const panelBox = panel.getBoundingClientRect()
+    const box = button.getBoundingClientRect()
+    const above = box.top - panelBox.top
+    const below = box.bottom - panelBox.bottom
+    if (above < 0) panel.scrollBy({ top: above, behavior: 'smooth' })
+    else if (below > 0) panel.scrollBy({ top: below, behavior: 'smooth' })
+  }
+
   const describe = current => {
     const done = current > total
     count.textContent = done ? 'できた！' : words.step(current, total)
@@ -61,7 +70,7 @@ export const createViewer = ({ stage, layer, shouts, panel, count, caption, prev
       const stepNumber = Number(button.dataset.step)
       button.classList.toggle('done', stepNumber < current)
       button.classList.toggle('current', stepNumber === current)
-      if (stepNumber === current && !sweeping) button.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      if (stepNumber === current && !sweeping) keepInView(button)
     }
   }
 
